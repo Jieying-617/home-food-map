@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/test-results/
 
 # next.js
 /.next/
@@ -46,4 +47,5 @@ next-env.d.ts
 
 # local sqlite database
 /prisma/dev.db
+
 
