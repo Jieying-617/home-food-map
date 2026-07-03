@@ -46,3 +46,7 @@ DATABASE_URL="file:./dev.db"
 npx prisma generate
 npm run prisma:seed
 ```
+## 跨设备继续开发
+
+下一台电脑或新 Codex 会话接续时，先读 [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md)。
+
