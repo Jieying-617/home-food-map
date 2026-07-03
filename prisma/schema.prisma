@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id        String     @id @default(cuid())
+  name      String
+  createdAt DateTime   @default(now())
+  members   Member[]
+  locations Location[]
+  foods     Food[]
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  familyId  String
+  nickname  String
+  role      String   @default("member")
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  family    Family   @relation(fields: [familyId], references: [id])
+}
+
+model Location {
+  id             String   @id @default(cuid())
+  familyId       String
+  name           String
+  photoUrl       String?
+  sketchCoverUrl String?
+  tags           String   @default("[]")
+  note           String?
+  isFrequent     Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdById    String?
+  createdAt      DateTime @default(now())
+  family         Family   @relation(fields: [familyId], references: [id])
+  foods          Food[]
+}
+
+model Food {
+  id           String      @id @default(cuid())
+  familyId     String
+  locationId   String
+  name         String
+  quantity     Float       @default(1)
+  unit         String      @default("件")
+  expiresAt    DateTime
+  datePhotoUrl String?
+  status       String      @default("active")
+  source       String      @default("manual")
+  note         String?
+  createdById  String?
+  lastActorId  String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  family       Family      @relation(fields: [familyId], references: [id])
+  location     Location    @relation(fields: [locationId], references: [id])
+  operations   Operation[]
+}
+
+model Operation {
+  id        String   @id @default(cuid())
+  familyId  String
+  foodId    String?
+  actorId   String?
+  type      String
+  before    String?
+  after     String?
+  createdAt DateTime @default(now())
+  food      Food?    @relation(fields: [foodId], references: [id])
+}
