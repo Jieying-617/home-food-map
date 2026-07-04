@@ -35,4 +35,3 @@ describe("recognizePackageDateWithGemini", () => {
     expect(body.generationConfig.responseMimeType).toBe("application/json");
   });
 });
-

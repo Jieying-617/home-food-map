@@ -78,4 +78,3 @@ export async function recognizePackageDateWithGemini({
   return normalizeVisionDateResult(JSON.parse(cleanJsonText(outputText)));
 }
 
-
