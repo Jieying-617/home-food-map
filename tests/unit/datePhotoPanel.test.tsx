@@ -79,5 +79,14 @@ describe("DatePhotoPanel", () => {
     expect(await screen.findByText(/OpenRouter 免费模型暂时限流/)).toBeVisible();
     expect(screen.queryByText(/OpenAI API 额度不足/)).not.toBeInTheDocument();
   });
-});
+  it("prioritizes Gemini invalid key guidance over OpenRouter rate-limit errors", async () => {
+    vi.mocked(recognizeDateByVision).mockRejectedValue(new Error("OpenRouter date recognition failed: 429 rate-limited upstream；Gemini date recognition failed: 400 API key not valid API_KEY_INVALID"));
+    vi.mocked(recognizeDateText).mockResolvedValue("【有效期】至 2027.12.");
 
+    render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
+    uploadImage();
+
+    expect(await screen.findByText(/Gemini API Key 无效/)).toBeVisible();
+    expect(screen.queryByText(/OpenRouter 免费模型暂时限流/)).not.toBeInTheDocument();
+  });
+});

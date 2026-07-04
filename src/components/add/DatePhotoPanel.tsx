@@ -34,6 +34,12 @@ function modelFailureMessage(error: unknown) {
   if (message.includes("OPENAI_API_KEY")) {
     return "OpenAI 识别未启用：请先配置 OPENAI_API_KEY 并重启服务。当前仅使用本地 OCR，可能不准。";
   }
+  if (message.includes("Gemini") && (message.includes("API key not valid") || message.includes("API_KEY_INVALID"))) {
+    return "Gemini API Key 无效：请在 Google AI Studio 重新创建 key，更新 .env 后重启服务。当前仅使用本地 OCR，可能不准。";
+  }
+  if (message.includes("invalid_api_key") || message.includes("401")) {
+    return "大模型 API Key 无效：请检查 .env 中的 OpenRouter/Gemini/OpenAI key 并重启服务。当前仅使用本地 OCR，可能不准。";
+  }
   if (
     message.includes("OpenRouter") ||
     message.includes("rate-limited upstream") ||
@@ -46,9 +52,6 @@ function modelFailureMessage(error: unknown) {
   }
   if (message.includes("429")) {
     return "大模型暂时限流：可以稍后重试，或配置其他模型作为备用。当前仅使用本地 OCR，可能不准。";
-  }
-  if (message.includes("invalid_api_key") || message.includes("401")) {
-    return "大模型 API Key 无效：请检查 .env 中的 OpenRouter/Gemini/OpenAI key 并重启服务。当前仅使用本地 OCR，可能不准。";
   }
   if (message.includes("connect") || message.includes("timeout") || message.includes("fetch failed")) {
     return "大模型识别连接失败：请检查代理或网络。当前仅使用本地 OCR，可能不准。";
