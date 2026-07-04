@@ -22,6 +22,17 @@ npm run dev
 
 打开：`http://localhost:3000`
 
+
+## 大模型日期识别
+
+拍日期添加会优先调用服务端 `/api/recognize-date` 使用大模型视觉识别；如果没有配置 `OPENAI_API_KEY` 或调用失败，会自动回退到本地 OCR。无论哪种识别方式，结果都会进入确认表单，保存前可以手动修改。
+
+`.env` 可选配置：
+
+```env
+OPENAI_API_KEY="你的 OpenAI API Key"
+OPENAI_DATE_MODEL="gpt-4.1"
+```
 ## 常用命令
 
 ```bash
@@ -49,4 +60,5 @@ npm run prisma:seed
 ## 跨设备继续开发
 
 下一台电脑或新 Codex 会话接续时，先读 [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md)。
+
 

@@ -2,8 +2,29 @@
 
 import { useState } from "react";
 import { parsePackageDate } from "@/lib/domain/dateParser";
-import { recognizeDateText } from "@/lib/adapters/ocr";
+import { recognizeDateByVision, recognizeDateText, type VisionDateResult } from "@/lib/adapters/ocr";
 import { AddFoodConfirmForm, type ConfirmDraft } from "./AddFoodConfirmForm";
+
+function buildDraft(expiresAt: string): ConfirmDraft {
+  return {
+    name: "",
+    quantity: 1,
+    unit: "件",
+    locationId: "",
+    expiresAt,
+    source: "date-photo",
+  };
+}
+
+function describeVisionResult(result: VisionDateResult) {
+  const lines = [];
+  if (result.batchNumber) lines.push(`批号：${result.batchNumber}`);
+  if (result.productionDate) lines.push(`生产日期：${result.productionDate}`);
+  if (result.expiryDate) lines.push(`到期日：${result.expiryDate}`);
+  if (result.explanation) lines.push(result.explanation);
+  if (result.rawText) lines.push(`原文：${result.rawText}`);
+  return lines.join("\n");
+}
 
 export function DatePhotoPanel({
   familyId,
@@ -14,39 +35,62 @@ export function DatePhotoPanel({
 }) {
   const [draft, setDraft] = useState<ConfirmDraft | null>(null);
   const [message, setMessage] = useState("");
+  const [recognizedText, setRecognizedText] = useState("");
+  const [recognitionSource, setRecognitionSource] = useState("");
 
   async function handleFile(file: File | null) {
     if (!file) return;
     setMessage("正在识别日期...");
+    setRecognizedText("");
+    setRecognitionSource("");
+
+    try {
+      const vision = await recognizeDateByVision(file);
+      setRecognitionSource("大模型识别");
+      setRecognizedText(describeVisionResult(vision));
+      setDraft(buildDraft(vision.confidence === "low" ? "" : vision.expiryDate ?? ""));
+      setMessage(vision.expiryDate && vision.confidence !== "low" ? "已识别日期，请确认后保存" : "日期不太确定，请手动选择到期日");
+      return;
+    } catch {
+      // Fall through to local OCR when the server-side model is unavailable.
+    }
+
     try {
       const text = await recognizeDateText(file);
+      setRecognitionSource("本地 OCR");
+      setRecognizedText(text.trim());
       const parsed = parsePackageDate(text, new Date());
-      setDraft({
-        name: "",
-        quantity: 1,
-        unit: "件",
-        locationId: "",
-        expiresAt: parsed.expiresAt,
-        source: "date-photo",
-      });
-      setMessage(parsed.confidence === "low" ? "日期不太确定，请仔细确认" : "已识别日期，请确认后保存");
+      const isLowConfidence = parsed.confidence === "low";
+      setDraft(buildDraft(isLowConfidence ? "" : parsed.expiresAt));
+      setMessage(isLowConfidence ? "日期不太确定，请手动选择到期日" : "已识别日期，请确认后保存");
     } catch {
       setMessage("识别失败，请手动选择到期日");
-      setDraft({ name: "", quantity: 1, unit: "件", locationId: "", expiresAt: "", source: "date-photo" });
+      setDraft(buildDraft(""));
     }
   }
 
   return (
     <section className="rounded-lg bg-white p-4">
       <h2 className="text-lg font-bold">拍日期添加</h2>
-      <input
-        className="mt-3 block w-full text-sm"
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
-      />
-      {message ? <p className="mt-2 text-sm text-slate-600">{message}</p> : null}
+      <label className="mt-3 block">
+        <span className="mb-1 block text-sm font-semibold text-slate-700">上传日期照片</span>
+        <input
+          aria-label="上传日期照片"
+          className="block w-full text-sm"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
+        />
+      </label>
+      <p className="mt-2 text-xs text-slate-500">优先使用大模型理解包装日期；失败时回退本地 OCR。保存前仍需要你确认。</p>
+      {message ? <p className="mt-2 text-sm font-semibold text-slate-700">{message}</p> : null}
+      {recognizedText ? (
+        <details className="mt-2 rounded-md bg-slate-50 p-3 text-xs text-slate-600" open>
+          <summary className="cursor-pointer font-semibold">识别原文{recognitionSource ? `（${recognitionSource}）` : ""}</summary>
+          <pre className="mt-2 whitespace-pre-wrap font-sans">{recognizedText}</pre>
+        </details>
+      ) : null}
       {draft ? (
         <div className="mt-4">
           <AddFoodConfirmForm familyId={familyId} locations={locations} draft={draft} />
