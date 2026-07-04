@@ -1,3 +1,5 @@
+import { ProxyAgent } from "undici";
+
 export type VisionDateConfidence = "high" | "medium" | "low";
 
 export type VisionDateResult = {
@@ -9,12 +11,16 @@ export type VisionDateResult = {
   explanation: string;
 };
 
+type FetchWithDispatcher = (url: string, init: RequestInit & { dispatcher?: unknown }) => Promise<Response>;
+
 type RecognizePackageDateInput = {
   apiKey: string;
   imageBase64: string;
   mimeType: string;
   model?: string;
-  fetchImpl?: typeof fetch;
+  proxyUrl?: string | null;
+  proxyAgentFactory?: (proxyUrl: string) => unknown;
+  fetchImpl?: FetchWithDispatcher;
 };
 
 const schema = {
@@ -55,6 +61,11 @@ function readOutputText(response: unknown): string {
   return "";
 }
 
+function normalizeProxyUrl(proxyUrl?: string | null): string | null {
+  const trimmed = proxyUrl?.trim();
+  return trimmed ? trimmed : null;
+}
+
 export function normalizeVisionDateResult(value: unknown): VisionDateResult {
   const data = typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
   const productionDate = isIsoDate(data.productionDate) ? data.productionDate : null;
@@ -75,9 +86,11 @@ export async function recognizePackageDateWithVision({
   imageBase64,
   mimeType,
   model = process.env.OPENAI_DATE_MODEL ?? "gpt-4.1",
+  proxyUrl = process.env.OPENAI_PROXY_URL ?? process.env.HTTPS_PROXY ?? process.env.HTTP_PROXY,
+  proxyAgentFactory = (url: string) => new ProxyAgent(url),
   fetchImpl = fetch,
 }: RecognizePackageDateInput): Promise<VisionDateResult> {
-  const response = await fetchImpl("https://api.openai.com/v1/responses", {
+  const requestInit: RequestInit & { dispatcher?: unknown } = {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -108,7 +121,14 @@ export async function recognizePackageDateWithVision({
         },
       },
     }),
-  });
+  };
+
+  const configuredProxyUrl = normalizeProxyUrl(proxyUrl);
+  if (configuredProxyUrl) {
+    requestInit.dispatcher = proxyAgentFactory(configuredProxyUrl);
+  }
+
+  const response = await fetchImpl("https://api.openai.com/v1/responses", requestInit);
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");

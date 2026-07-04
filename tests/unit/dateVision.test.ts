@@ -72,4 +72,35 @@ describe("recognizePackageDateWithVision", () => {
     expect(JSON.stringify(body.input)).toContain("data:image/jpeg;base64,abc123");
     expect(body.text.format.type).toBe("json_schema");
   });
+  it("passes a proxy dispatcher to fetch when proxyUrl is provided", async () => {
+    const dispatcher = { kind: "proxy-dispatcher" };
+    const proxyAgentFactory = vi.fn().mockReturnValue(dispatcher);
+    const fetchImpl = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          output_text: JSON.stringify({
+            productionDate: null,
+            expiryDate: "2027-12-31",
+            batchNumber: null,
+            confidence: "medium",
+            rawText: "有效期至 2027.12",
+            explanation: "有效期只标到年月，按月末处理。",
+          }),
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    await recognizePackageDateWithVision({
+      apiKey: "test-key",
+      imageBase64: "abc123",
+      mimeType: "image/jpeg",
+      fetchImpl,
+      proxyUrl: "http://127.0.0.1:7897",
+      proxyAgentFactory,
+    });
+
+    expect(proxyAgentFactory).toHaveBeenCalledWith("http://127.0.0.1:7897");
+    expect(fetchImpl.mock.calls[0][1]).toEqual(expect.objectContaining({ dispatcher }));
+  });
 });
