@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "家里还有啥",
-  description: "家庭位置地图与食物到期提醒",
+  description: "家庭食材位置地图与到期提醒",
 };
 
 export const viewport: Viewport = {

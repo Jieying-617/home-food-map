@@ -10,6 +10,14 @@ describe("applyInventoryAction", () => {
     expect(result).toMatchObject({ quantity: 2, status: "active" });
   });
 
+  it("supports fractional take quantities", () => {
+    const result = applyInventoryAction(
+      { id: "f1", name: "cookies", quantity: 2, unit: "bag", status: "active" },
+      { type: "take", quantity: 0.5 },
+    );
+    expect(result).toMatchObject({ quantity: 1.5, status: "active" });
+  });
+
   it("marks item as finished when finishing all quantity", () => {
     const result = applyInventoryAction(
       { id: "f1", name: "牛奶", quantity: 1, unit: "箱", status: "active" },

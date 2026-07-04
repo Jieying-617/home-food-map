@@ -1,5 +1,6 @@
 import { format } from "date-fns";
-import { PackageCheck, Trash2, Utensils } from "lucide-react";
+import { CalendarDays, MapPin, Trash2, Utensils } from "lucide-react";
+import { ConsumeFoodButton } from "@/components/food/ConsumeFoodButton";
 import { getExpiryNotice } from "@/lib/domain/expiry";
 import { performFoodAction } from "@/lib/server/foods";
 
@@ -17,20 +18,16 @@ type FoodCardProps = {
 };
 
 const noticeClass = {
-  expired: "bg-red-100 text-red-800",
-  today: "bg-red-100 text-red-800",
-  soon: "bg-orange-100 text-orange-800",
-  warning: "bg-yellow-100 text-yellow-800",
-  normal: "bg-emerald-50 text-emerald-800",
-  later: "bg-slate-100 text-slate-700",
+  expired: "border-red-200 bg-red-50 text-red-800",
+  today: "border-red-200 bg-red-50 text-red-800",
+  soon: "border-orange-200 bg-orange-50 text-orange-800",
+  warning: "border-amber-200 bg-amber-50 text-amber-800",
+  normal: "border-teal-200 bg-teal-50 text-teal-800",
+  later: "border-slate-200 bg-slate-50 text-slate-700",
 };
 
 function formatQuantity(quantity: number) {
   return Number.isInteger(quantity) ? String(quantity) : String(quantity).replace(/\.0+$/, "");
-}
-
-function formatTakeLabel(unit: string) {
-  return `消耗1${unit}`;
 }
 
 export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) {
@@ -38,40 +35,43 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
   const notice = getExpiryNotice(expiresAt, today);
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+    <article className="rounded-lg border border-[var(--color-border)] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-bold text-slate-950">{food.name}</h3>
-          <p className="mt-1 text-sm text-slate-600">
-            {formatQuantity(food.quantity)}{food.unit} · {food.location.name}
-          </p>
-          <p className="mt-1 text-sm text-slate-600">到期：{expiresAt}</p>
+          <h3 className="truncate text-lg font-black text-slate-950">{food.name}</h3>
+          <div className="mt-2 flex flex-wrap gap-2 text-sm text-slate-600">
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 font-semibold text-slate-700">
+              {formatQuantity(food.quantity)}
+              {food.unit}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1">
+              <MapPin aria-hidden className="h-3.5 w-3.5" />
+              {food.location.name}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1">
+              <CalendarDays aria-hidden className="h-3.5 w-3.5" />
+              {expiresAt}
+            </span>
+          </div>
         </div>
-        <span className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${noticeClass[notice.tone]}`}>
+        <span className={`shrink-0 rounded-full border px-3 py-1 text-sm font-bold ${noticeClass[notice.tone]}`}>
           {notice.label}
         </span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <form
-          action={async () => {
-            "use server";
-            await performFoodAction({ familyId, foodId: food.id, type: "take", quantity: 1 });
-          }}
-        >
-          <button className="flex min-h-12 w-full items-center justify-center gap-1 rounded-md bg-emerald-50 px-1 text-sm font-semibold text-emerald-800">
-            <PackageCheck aria-hidden className="h-4 w-4 shrink-0" />
-            <span>{formatTakeLabel(food.unit)}</span>
-          </button>
-        </form>
+        <ConsumeFoodButton familyId={familyId} foodId={food.id} unit={food.unit} />
         <form
           action={async () => {
             "use server";
             await performFoodAction({ familyId, foodId: food.id, type: "finish" });
           }}
         >
-          <button className="flex min-h-12 w-full items-center justify-center gap-1 rounded-md bg-blue-50 px-1 text-sm font-semibold text-blue-800">
+          <button
+            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-sky-50 px-2 text-sm font-bold text-sky-800 hover:bg-sky-100"
+            type="submit"
+          >
             <Utensils aria-hidden className="h-4 w-4 shrink-0" />
-            <span>全部消耗</span>
+            <span className="truncate">全部吃完</span>
           </button>
         </form>
         <form
@@ -80,9 +80,12 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
             await performFoodAction({ familyId, foodId: food.id, type: "discard" });
           }}
         >
-          <button className="flex min-h-12 w-full items-center justify-center gap-1 rounded-md bg-rose-50 px-1 text-sm font-semibold text-rose-800">
+          <button
+            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-50 px-2 text-sm font-bold text-rose-800 hover:bg-rose-100"
+            type="submit"
+          >
             <Trash2 aria-hidden className="h-4 w-4 shrink-0" />
-            <span>全部丢弃</span>
+            <span className="truncate">丢弃</span>
           </button>
         </form>
       </div>

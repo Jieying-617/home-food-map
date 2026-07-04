@@ -1,7 +1,9 @@
+import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { DatePhotoPanel } from "@/components/add/DatePhotoPanel";
 import { ManualEntryPanel } from "@/components/add/ManualEntryPanel";
 import { VoiceEntryPanel } from "@/components/add/VoiceEntryPanel";
+import { CurrentMemberNotice } from "@/components/family/CurrentMemberNotice";
 import { listLocations } from "@/lib/server/locations";
 
 type PageProps = {
@@ -17,15 +19,20 @@ export default async function AddFoodPage({ params, searchParams }: PageProps) {
   const initialLocationId = choices.some((location) => location.id === locationId) ? locationId ?? "" : "";
 
   return (
-    <main className="min-h-screen px-4 pb-24 pt-5">
-      <h1 className="text-2xl font-bold">添加食物</h1>
-      <p className="mt-1 text-slate-600">识别出来的内容都可以先改，再保存</p>
-      <div className="mt-5 space-y-5">
+    <AppShell bottomNav={<BottomNav familyId={familyId} />}>
+      <PageHeader
+        eyebrow="新增库存"
+        title="把食物放进地图"
+        description="先选择最快的录入方式，识别结果都可以在保存前修改。位置越准确，之后找东西和处理到期越省心。"
+      />
+      <CurrentMemberNotice familyId={familyId} />
+      <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
         <VoiceEntryPanel familyId={familyId} locations={choices} initialLocationId={initialLocationId} />
         <DatePhotoPanel familyId={familyId} locations={choices} initialLocationId={initialLocationId} />
-        <ManualEntryPanel familyId={familyId} locations={choices} initialLocationId={initialLocationId} />
+        <div className="lg:col-span-2">
+          <ManualEntryPanel familyId={familyId} locations={choices} initialLocationId={initialLocationId} />
+        </div>
       </div>
-      <BottomNav familyId={familyId} />
-    </main>
+    </AppShell>
   );
 }

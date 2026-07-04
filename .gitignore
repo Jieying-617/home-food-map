@@ -48,6 +48,9 @@ next-env.d.ts
 # local sqlite database
 /prisma/dev.db
 
+# local uploaded files generated while running the demo
+/public/uploads/
+
 # local tesseract data downloaded during OCR experiments
 *.traineddata
 

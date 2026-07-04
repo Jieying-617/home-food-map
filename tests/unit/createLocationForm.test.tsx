@@ -13,7 +13,7 @@ describe("CreateLocationForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "保存位置" }));
 
-    expect(await screen.findByText("位置名称不能为空")).toBeVisible();
+    expect(await screen.findByText("位置名称不能为空。")).toBeVisible();
     expect(createLocation).not.toHaveBeenCalled();
   });
 
@@ -34,6 +34,6 @@ describe("CreateLocationForm", () => {
         sketchCoverUrl: undefined,
       });
     });
-    expect(await screen.findByText("位置已保存")).toBeVisible();
+    expect(await screen.findByText("位置已保存。")).toBeVisible();
   });
 });

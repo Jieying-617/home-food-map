@@ -24,7 +24,7 @@ describe("JoinFamilyForm", () => {
     await waitFor(() => {
       expect(joinFamilyByInviteCode).toHaveBeenCalledWith({ inviteCode: "WOJIA", nickname: "阿姨" });
     });
-    expect(await screen.findByText("加入成功"));
+    expect(await screen.findByText("加入成功。")).toBeVisible();
     expect(screen.getByRole("link", { name: "进入我们家" })).toHaveAttribute("href", "/f/demo/family");
   });
 
@@ -33,7 +33,7 @@ describe("JoinFamilyForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "加入家庭" }));
 
-    expect(await screen.findByText("邀请码和称呼都要填写"));
+    expect(await screen.findByText("邀请码和称呼都要填写。")).toBeVisible();
     expect(joinFamilyByInviteCode).not.toHaveBeenCalled();
   });
 });

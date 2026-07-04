@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Plus } from "lucide-react";
+import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { FoodCard } from "@/components/food/FoodCard";
+import { LocationCoverManager } from "@/components/location/LocationCoverManager";
 import { listFoods } from "@/lib/server/foods";
 import { listLocations } from "@/lib/server/locations";
 
@@ -19,28 +22,33 @@ export default async function LocationDetailPage({ params }: PageProps) {
   if (!location) notFound();
 
   return (
-    <main className="min-h-screen px-4 pb-24 pt-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold">{location.name}</h1>
-          <p className="mt-1 text-slate-600">默认按到期时间排序</p>
-        </div>
-        <Link
-          href={`/f/${familyId}/add?locationId=${locationId}`}
-          className="shrink-0 rounded-md bg-emerald-700 px-3 py-2 text-sm font-bold text-white"
-        >
-          添加到这里
-        </Link>
-      </div>
-      <section className="mt-5 space-y-3">
+    <AppShell bottomNav={<BottomNav familyId={familyId} />}>
+      <PageHeader
+        eyebrow="位置详情"
+        title={location.name}
+        description={`这里有 ${foods.length} 件在库食物，默认按到期时间排序。处理完的东西会进入操作记录。`}
+        action={
+          <Link
+            href={`/f/${familyId}/add?locationId=${locationId}`}
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-bold text-white hover:opacity-90"
+          >
+            <Plus aria-hidden className="h-4 w-4" />
+            添加到这里
+          </Link>
+        }
+      />
+      <LocationCoverManager familyId={familyId} location={location} />
+      <section className="grid gap-3 lg:grid-cols-2">
         {foods.map((food) => (
           <FoodCard key={food.id} familyId={familyId} food={food} />
         ))}
         {foods.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 text-slate-600">这个位置暂时没有在库食物。</p>
+          <div className="rounded-lg border border-[var(--color-border)] bg-white p-6 text-center lg:col-span-2">
+            <p className="text-lg font-black text-slate-950">这个位置暂时没有在库食物</p>
+            <p className="mt-2 text-sm text-slate-600">下次收纳时可以直接添加到这里。</p>
+          </div>
         ) : null}
       </section>
-      <BottomNav familyId={familyId} />
-    </main>
+    </AppShell>
   );
 }

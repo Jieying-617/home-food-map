@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Check, MapPin } from "lucide-react";
 import { createFood } from "@/lib/server/foods";
 
 export type ConfirmDraft = {
@@ -30,6 +31,8 @@ function nextBlankDraft(draft: ConfirmDraft, locationId: string): ConfirmDraft {
   };
 }
 
+const inputClass = "min-h-12 w-full rounded-md border border-slate-300 bg-white p-3 text-slate-950";
+
 export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfirmFormProps) {
   const [form, setForm] = useState(draft);
   const [message, setMessage] = useState("");
@@ -38,7 +41,7 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
 
   async function save() {
     if (!form.name.trim() || !form.locationId || !form.expiresAt) {
-      setMessage("名称、位置、到期日都要确认后才能保存");
+      setMessage("名称、位置、到期日都确认后才能保存。");
       return;
     }
 
@@ -53,9 +56,9 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         quantity: Number.isFinite(form.quantity) && form.quantity > 0 ? form.quantity : 1,
       });
       setSavedLocationId(form.locationId);
-      setMessage("已保存");
+      setMessage("已保存到库存。");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "保存失败，请稍后再试");
+      setMessage(error instanceof Error ? error.message : "保存失败，请稍后再试。");
     } finally {
       setIsSaving(false);
     }
@@ -68,21 +71,21 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
   }
 
   return (
-    <div className="space-y-3 rounded-lg bg-white p-4">
-      <label className="block">
-        <span className="mb-1 block text-sm font-semibold text-slate-700">食物名称</span>
-        <input
-          className="min-h-12 w-full rounded-md border border-slate-300 p-3"
-          value={form.name}
-          placeholder="例如：蛋黄派"
-          onChange={(event) => setForm({ ...form, name: event.target.value })}
-        />
-      </label>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="block">
-          <span className="mb-1 block text-sm font-semibold text-slate-700">数量</span>
+    <div className="space-y-3 rounded-lg border border-[var(--color-border)] bg-white p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block sm:col-span-2">
+          <span className="mb-1 block text-sm font-bold text-slate-700">食物名称</span>
           <input
-            className="min-h-12 w-full rounded-md border border-slate-300 p-3"
+            className={inputClass}
+            value={form.name}
+            placeholder="例如：鸡蛋、牛奶、吐司"
+            onChange={(event) => setForm({ ...form, name: event.target.value })}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-sm font-bold text-slate-700">数量</span>
+          <input
+            className={inputClass}
             type="number"
             min="0.1"
             step="0.1"
@@ -91,20 +94,20 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
           />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-semibold text-slate-700">单位</span>
+          <span className="mb-1 block text-sm font-bold text-slate-700">单位</span>
           <input
-            className="min-h-12 w-full rounded-md border border-slate-300 p-3"
+            className={inputClass}
             value={form.unit}
-            placeholder="包"
+            placeholder="盒、袋、瓶"
             onChange={(event) => setForm({ ...form, unit: event.target.value })}
           />
         </label>
       </div>
       <label className="block">
-        <span className="mb-1 block text-sm font-semibold text-slate-700">存放位置</span>
+        <span className="mb-1 block text-sm font-bold text-slate-700">存放位置</span>
         <select
           aria-label="存放位置"
-          className="min-h-12 w-full rounded-md border border-slate-300 p-3"
+          className={inputClass}
           value={form.locationId}
           onChange={(event) => setForm({ ...form, locationId: event.target.value })}
         >
@@ -117,37 +120,39 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         </select>
       </label>
       <label className="block">
-        <span className="mb-1 block text-sm font-semibold text-slate-700">到期日</span>
+        <span className="mb-1 block text-sm font-bold text-slate-700">到期日</span>
         <input
           aria-label="到期日"
-          className="min-h-12 w-full rounded-md border border-slate-300 p-3"
+          className={inputClass}
           type="date"
           value={form.expiresAt}
           onChange={(event) => setForm({ ...form, expiresAt: event.target.value })}
         />
       </label>
       <button
-        className="min-h-12 w-full rounded-md bg-emerald-700 font-bold text-white disabled:bg-slate-300"
+        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 font-bold text-white hover:bg-[var(--color-primary-strong)] disabled:cursor-not-allowed disabled:bg-slate-300"
         type="button"
         disabled={isSaving}
         onClick={save}
       >
-        {isSaving ? "保存中" : "确认保存"}
+        <Check aria-hidden className="h-4 w-4" />
+        {isSaving ? "保存中..." : "确认保存"}
       </button>
-      {message ? <p className="text-sm text-slate-700">{message}</p> : null}
+      {message ? <p className="text-sm font-semibold text-slate-700">{message}</p> : null}
       {savedLocationId ? (
-        <div className="grid grid-cols-2 gap-3 rounded-md bg-emerald-50 p-3">
+        <div className="grid gap-3 rounded-md bg-[var(--color-primary-soft)] p-3 sm:grid-cols-2">
           <button
-            className="min-h-11 rounded-md bg-white px-3 text-sm font-bold text-emerald-800"
+            className="min-h-11 cursor-pointer rounded-md bg-white px-3 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)]"
             type="button"
             onClick={continueAdding}
           >
             继续添加同位置
           </button>
           <Link
-            className="flex min-h-11 items-center justify-center rounded-md bg-emerald-700 px-3 text-sm font-bold text-white"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-3 text-sm font-bold text-white hover:bg-[var(--color-primary-strong)]"
             href={`/f/${familyId}/locations/${savedLocationId}`}
           >
+            <MapPin aria-hidden className="h-4 w-4" />
             查看这个位置
           </Link>
         </div>

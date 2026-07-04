@@ -19,7 +19,7 @@ describe("AddFoodConfirmForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "确认保存" }));
 
-    expect(await screen.findByText("名称、位置、到期日都要确认后才能保存")).toBeVisible();
+    expect(await screen.findByText("名称、位置、到期日都确认后才能保存。")).toBeVisible();
     expect(createFood).not.toHaveBeenCalled();
   });
 
@@ -49,7 +49,7 @@ describe("AddFoodConfirmForm", () => {
         source: "voice",
       });
     });
-    expect(await screen.findByText("已保存")).toBeVisible();
+    expect(await screen.findByText("已保存到库存。")).toBeVisible();
   });
 
   it("offers clear next steps after saving a food", async () => {
@@ -65,10 +65,11 @@ describe("AddFoodConfirmForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "确认保存" }));
 
-    expect(await screen.findByText("已保存"));
+    expect(await screen.findByText("已保存到库存。")).toBeVisible();
     expect(screen.getByRole("button", { name: "继续添加同位置" })).toBeVisible();
     expect(screen.getByRole("link", { name: "查看这个位置" })).toHaveAttribute("href", "/f/demo/locations/loc-1");
   });
+
   it("keeps the saved location while clearing fields for the next food", async () => {
     vi.mocked(createFood).mockResolvedValue({ id: "food-1" } as never);
 
@@ -81,7 +82,7 @@ describe("AddFoodConfirmForm", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "确认保存" }));
-    await screen.findByText("已保存");
+    await screen.findByText("已保存到库存。");
     fireEvent.click(screen.getByRole("button", { name: "继续添加同位置" }));
 
     expect(screen.getByLabelText("存放位置")).toHaveValue("loc-1");

@@ -28,8 +28,8 @@ describe("DatePhotoPanel", () => {
     render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
     uploadImage();
 
-    expect(await screen.findByText("已识别日期，请确认后保存")).toBeVisible();
-    expect(screen.getByText("识别原文（大模型识别）")).toBeVisible();
+    expect(await screen.findByText("已识别日期，请确认后保存。")).toBeVisible();
+    expect(screen.getByText(/大模型识别/)).toBeVisible();
     expect(screen.getByText(/2027\.12/)).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue("2027-12-31"));
     expect(recognizeDateText).not.toHaveBeenCalled();
@@ -42,8 +42,8 @@ describe("DatePhotoPanel", () => {
     render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
     uploadImage();
 
-    expect(await screen.findByText("本地 OCR 已提取日期，请仔细确认后保存")).toBeVisible();
-    expect(screen.getByText("识别原文（本地 OCR）")).toBeVisible();
+    expect(await screen.findByText("本地 OCR 已提取日期，请仔细确认后保存。")).toBeVisible();
+    expect(screen.getAllByText(/本地 OCR/).length).toBeGreaterThan(0);
     expect(screen.getByText(/到期日：2027-12-31/)).toBeVisible();
     expect(screen.getByText(/大模型识别暂不可用/)).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue("2027-12-31"));
@@ -56,7 +56,7 @@ describe("DatePhotoPanel", () => {
     render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
     uploadImage();
 
-    expect(await screen.findByText("日期不太确定，请手动选择到期日"));
+    expect(await screen.findByText("日期不太确定，请手动选择到期日。")).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue(""));
   });
 
@@ -70,8 +70,11 @@ describe("DatePhotoPanel", () => {
     expect(await screen.findByText(/OpenAI API 额度不足/)).toBeVisible();
     expect(screen.getByText(/检查账号计费或充值/)).toBeVisible();
   });
+
   it("prioritizes OpenRouter rate-limit guidance over OpenAI fallback quota errors", async () => {
-    vi.mocked(recognizeDateByVision).mockRejectedValue(new Error("OpenRouter date recognition failed: 429 google/gemma-4-31b-it:free is temporarily rate-limited upstream；OpenAI date recognition failed: 429 insufficient_quota"));
+    vi.mocked(recognizeDateByVision).mockRejectedValue(
+      new Error("OpenRouter date recognition failed: 429 google/gemma-4-31b-it:free is temporarily rate-limited upstream；OpenAI date recognition failed: 429 insufficient_quota"),
+    );
     vi.mocked(recognizeDateText).mockResolvedValue("【有效期】至 2027.12.");
 
     render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
@@ -80,6 +83,7 @@ describe("DatePhotoPanel", () => {
     expect(await screen.findByText(/OpenRouter 免费模型暂时限流/)).toBeVisible();
     expect(screen.queryByText(/OpenAI API 额度不足/)).not.toBeInTheDocument();
   });
+
   it("prioritizes Gemini invalid key guidance over OpenRouter rate-limit errors", async () => {
     vi.mocked(recognizeDateByVision).mockRejectedValue(new Error("OpenRouter date recognition failed: 429 rate-limited upstream；Gemini date recognition failed: 400 API key not valid API_KEY_INVALID"));
     vi.mocked(recognizeDateText).mockResolvedValue("【有效期】至 2027.12.");

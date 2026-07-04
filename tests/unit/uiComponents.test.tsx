@@ -40,9 +40,10 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByText(/妈妈零食柜/)).toBeVisible();
     expect(screen.getByText(/2026-07-06/)).toBeVisible();
     expect(screen.getByText("还有 2 天")).toBeVisible();
-    expect(screen.getByRole("button", { name: /消耗1包/ })).toBeVisible();
-    expect(screen.getByRole("button", { name: /全部消耗/ })).toBeVisible();
-    expect(screen.getByRole("button", { name: /全部丢弃/ })).toBeVisible();
+    expect(screen.getByRole("button", { name: /消耗\s*1包/ })).toBeVisible();
+    expect(screen.getByRole("button", { name: "更多消耗数量" })).toBeVisible();
+    expect(screen.getByRole("button", { name: /全部吃完/ })).toBeVisible();
+    expect(screen.getByRole("button", { name: /丢弃/ })).toBeVisible();
   });
 
   it("links a location card to its detail page and summarizes active foods", () => {
@@ -61,6 +62,7 @@ describe("Task 4 inventory UI components", () => {
 
     expect(screen.getByRole("link", { name: /妈妈零食柜/ })).toHaveAttribute("href", "/f/demo/locations/loc-1");
     expect(screen.getByText("1 件在库")).toBeVisible();
-    expect(screen.getByText(/最近到期：蛋黄派/)).toBeVisible();
+    expect(screen.getByText("蛋黄派")).toBeVisible();
+    expect(screen.getByText(/最近到期：2026\/8\/20/)).toBeVisible();
   });
 });

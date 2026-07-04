@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { applyInventoryAction, type InventoryFood } from "@/lib/domain/inventory";
+import { getCurrentMemberId } from "@/lib/server/currentMember";
 
 export type CreateFoodInput = {
   familyId: string;
@@ -31,6 +32,7 @@ export async function createFood(input: CreateFoodInput) {
   if (!input.locationId) throw new Error("必须选择存放位置");
   if (!input.expiresAt) throw new Error("必须填写到期日");
 
+  const actorId = await getCurrentMemberId(input.familyId);
   const food = await db.food.create({
     data: {
       familyId: input.familyId,
@@ -41,10 +43,12 @@ export async function createFood(input: CreateFoodInput) {
       expiresAt: new Date(input.expiresAt),
       datePhotoUrl: input.datePhotoUrl,
       source: input.source,
+      createdById: actorId,
+      lastActorId: actorId,
     },
   });
   await db.operation.create({
-    data: { familyId: input.familyId, foodId: food.id, type: "create", after: JSON.stringify(food) },
+    data: { familyId: input.familyId, foodId: food.id, actorId, type: "create", after: JSON.stringify(food) },
   });
   revalidatePath(`/f/${input.familyId}`);
   return food;
@@ -52,6 +56,7 @@ export async function createFood(input: CreateFoodInput) {
 
 export async function performFoodAction(input: { familyId: string; foodId: string; type: "take" | "finish" | "discard"; quantity?: number }) {
   const food = await db.food.findUniqueOrThrow({ where: { id: input.foodId } });
+  const actorId = await getCurrentMemberId(input.familyId);
   const current: InventoryFood = {
     id: food.id,
     name: food.name,
@@ -59,18 +64,21 @@ export async function performFoodAction(input: { familyId: string; foodId: strin
     unit: food.unit,
     status: food.status as InventoryFood["status"],
   };
+  const takeQuantity =
+    typeof input.quantity === "number" && Number.isFinite(input.quantity) && input.quantity > 0 ? input.quantity : 1;
   const next = applyInventoryAction(
     current,
-    input.type === "take" ? { type: "take", quantity: input.quantity ?? 1 } : { type: input.type },
+    input.type === "take" ? { type: "take", quantity: takeQuantity } : { type: input.type },
   );
   const updated = await db.food.update({
     where: { id: food.id },
-    data: { quantity: next.quantity, status: next.status },
+    data: { quantity: next.quantity, status: next.status, lastActorId: actorId },
   });
   await db.operation.create({
     data: {
       familyId: input.familyId,
       foodId: food.id,
+      actorId,
       type: input.type,
       before: JSON.stringify(food),
       after: JSON.stringify(updated),
