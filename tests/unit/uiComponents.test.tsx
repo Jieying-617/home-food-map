@@ -12,7 +12,7 @@ describe("Task 4 inventory UI components", () => {
   it("renders the mobile bottom navigation for a family", () => {
     render(<BottomNav familyId="demo" />);
 
-    expect(screen.getByRole("link", { name: /快到期/ })).toHaveAttribute("href", "/f/demo");
+    expect(screen.getByRole("link", { name: /提醒/ })).toHaveAttribute("href", "/f/demo");
     expect(screen.getByRole("link", { name: /位置/ })).toHaveAttribute("href", "/f/demo/locations");
     expect(screen.getByRole("link", { name: /添加/ })).toHaveAttribute("href", "/f/demo/add");
     expect(screen.getByRole("link", { name: /记录/ })).toHaveAttribute("href", "/f/demo/records");

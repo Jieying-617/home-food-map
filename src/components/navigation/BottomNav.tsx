@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Home, Map, PlusCircle, ScrollText, Users } from "lucide-react";
+import { Bell, Map, PlusCircle, ScrollText, Users } from "lucide-react";
 
 const items = [
-  { label: "快到期", href: "", icon: Home },
+  { label: "提醒", href: "", icon: Bell },
   { label: "位置", href: "/locations", icon: Map },
   { label: "添加", href: "/add", icon: PlusCircle },
   { label: "记录", href: "/records", icon: ScrollText },

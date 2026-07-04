@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { AlertTriangle, CalendarDays, Clock3, ShieldCheck } from "lucide-react";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { FoodCard } from "@/components/food/FoodCard";
-import { groupExpiry, type ExpiryGroups } from "@/lib/domain/expiry";
+import { groupExpiry, summarizeExpiry, type ExpiryGroups } from "@/lib/domain/expiry";
 import { listFoods } from "@/lib/server/foods";
 import { listLocations } from "@/lib/server/locations";
 
@@ -87,13 +88,44 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
     })),
     today,
   );
+  const summary = summarizeExpiry(groups);
   const groupedSections = mapFoodsByGroup(foods, groups);
   const urgentCount = groupedSections.reduce((count, section) => count + section.foods.length, 0);
 
+  const summaryCards = [
+    { label: "已过期", value: summary.expiredCount, icon: AlertTriangle, className: "bg-red-50 text-red-800" },
+    { label: "今天到期", value: summary.todayCount, icon: Clock3, className: "bg-rose-50 text-rose-800" },
+    { label: "7 天内", value: summary.within7DaysCount, icon: CalendarDays, className: "bg-amber-50 text-amber-800" },
+    { label: "30 天内", value: summary.within30DaysCount, icon: ShieldCheck, className: "bg-emerald-50 text-emerald-800" },
+  ];
+
   return (
     <main className="min-h-screen px-4 pb-24 pt-5">
-      <h1 className="text-2xl font-bold">快到期</h1>
-      <p className="mt-1 text-slate-600">先处理最容易忘的东西</p>
+      <h1 className="text-2xl font-bold">提醒中心</h1>
+      <p className="mt-1 text-slate-600">每天先看这里，家里快到期的东西不容易漏掉</p>
+
+      <section className="mt-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <p className="text-sm font-semibold text-slate-500">今日处理建议</p>
+        <p className="mt-2 text-xl font-bold text-slate-950">{summary.headline}</p>
+        <p className="mt-1 text-sm text-slate-600">
+          当前筛选下共有 {summary.totalReminderCount} 件 30 天内到期，其中 {summary.urgentCount} 件需要优先处理。
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {summaryCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div key={card.label} className={`rounded-lg p-3 ${card.className}`}>
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <Icon aria-hidden className="h-4 w-4 shrink-0" />
+                  <span>{card.label}</span>
+                </div>
+                <p className="mt-2 text-2xl font-bold">{card.value}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
         <Link className={filterClass(!locationId)} href={`/f/${familyId}`}>
           全部

@@ -2,6 +2,12 @@
 
 家庭位置地图与食物到期提醒试用版网页。当前目标是先做网页 MVP，后续可以复用业务接口迁移到微信小程序，不做原生 App。
 
+## 当前试用功能
+
+- 首页是站内提醒中心：汇总已过期、今天到期、7 天内和 30 天内到期的食物。
+- 支持按柜子/位置筛选提醒，直接在食物卡片上标记拿取、吃完或丢弃。
+- 添加食物支持手动、语音和拍日期识别，识别结果保存前都可以修改。
+
 ## 技术栈
 
 - Next.js + React + TypeScript
@@ -22,7 +28,6 @@ npm run dev
 
 打开：`http://localhost:3000`
 
-
 ## 大模型日期识别
 
 拍日期添加会优先调用服务端 `/api/recognize-date` 使用大模型视觉识别；如果没有配置 `OPENAI_API_KEY` 或调用失败，会自动回退到本地 OCR。无论哪种识别方式，结果都会进入确认表单，保存前可以手动修改。
@@ -32,7 +37,10 @@ npm run dev
 ```env
 OPENAI_API_KEY="你的 OpenAI API Key"
 OPENAI_DATE_MODEL="gpt-4.1"
+# 如果本机/服务器不能直连 api.openai.com，可以配置代理
+OPENAI_PROXY_URL="http://127.0.0.1:7897"
 ```
+
 ## 常用命令
 
 ```bash
@@ -57,8 +65,7 @@ DATABASE_URL="file:./dev.db"
 npx prisma generate
 npm run prisma:seed
 ```
+
 ## 跨设备继续开发
 
 下一台电脑或新 Codex 会话接续时，先读 [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md)。
-
-

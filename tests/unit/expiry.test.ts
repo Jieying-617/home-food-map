@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getExpiryNotice, groupExpiry } from "@/lib/domain/expiry";
+import { getExpiryNotice, groupExpiry, summarizeExpiry } from "@/lib/domain/expiry";
 
 describe("groupExpiry", () => {
   it("groups active foods by urgency and ignores resolved foods", () => {
@@ -20,6 +20,29 @@ describe("groupExpiry", () => {
   });
 });
 
+describe("summarizeExpiry", () => {
+  it("counts reminder buckets and chooses the highest priority action", () => {
+    const grouped = groupExpiry(
+      [
+        { id: "a", name: "酸奶", expiresAt: "2026-07-02", status: "active", locationId: "l1", quantity: 1, unit: "杯" },
+        { id: "b", name: "牛奶", expiresAt: "2026-07-04", status: "active", locationId: "l1", quantity: 1, unit: "盒" },
+        { id: "c", name: "草莓", expiresAt: "2026-07-06", status: "active", locationId: "l2", quantity: 1, unit: "盒" },
+        { id: "d", name: "坚果", expiresAt: "2026-08-01", status: "active", locationId: "l3", quantity: 1, unit: "袋" },
+      ],
+      new Date("2026-07-04T00:00:00+08:00"),
+    );
+
+    expect(summarizeExpiry(grouped)).toEqual({
+      expiredCount: 1,
+      todayCount: 1,
+      within7DaysCount: 1,
+      within30DaysCount: 1,
+      urgentCount: 3,
+      totalReminderCount: 4,
+      headline: "1 件已过期，先检查能不能处理",
+    });
+  });
+});
 describe("getExpiryNotice", () => {
   const today = new Date("2026-07-04T00:00:00+08:00");
 
