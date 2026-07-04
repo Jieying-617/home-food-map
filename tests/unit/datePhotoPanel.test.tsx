@@ -44,7 +44,7 @@ describe("DatePhotoPanel", () => {
 
     expect(await screen.findByText("本地 OCR 已提取日期，请仔细确认后保存")).toBeVisible();
     expect(screen.getByText("识别原文（本地 OCR）")).toBeVisible();
-    expect(screen.getByText(/大模型识别未启用或暂不可用/)).toBeVisible();
+    expect(screen.getByText(/大模型识别暂不可用/)).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue("2027-12-31"));
   });
 
@@ -58,7 +58,15 @@ describe("DatePhotoPanel", () => {
     expect(await screen.findByText("日期不太确定，请手动选择到期日"));
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue(""));
   });
+
+  it("shows billing guidance when model quota is exhausted", async () => {
+    vi.mocked(recognizeDateByVision).mockRejectedValue(new Error("OpenAI date recognition failed: 429 insufficient_quota"));
+    vi.mocked(recognizeDateText).mockResolvedValue("【有效期】至 2027.12.");
+
+    render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
+    uploadImage();
+
+    expect(await screen.findByText(/OpenAI API 额度不足/)).toBeVisible();
+    expect(screen.getByText(/检查账号计费或充值/)).toBeVisible();
+  });
 });
-
-
-
