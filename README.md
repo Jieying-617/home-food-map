@@ -31,20 +31,20 @@ npm run dev
 
 ## 大模型日期识别
 
-拍日期添加会优先调用服务端 `/api/recognize-date` 使用大模型视觉识别；服务端按 OpenRouter、Gemini、OpenAI 的顺序尝试，全部未配置或失败时会自动回退到本地 OCR。无论哪种识别方式，结果都会进入确认表单，保存前可以手动修改。
+拍日期添加会优先调用服务端 `/api/recognize-date` 使用大模型视觉识别；服务端按 Gemini、OpenRouter、OpenAI 的顺序尝试，全部未配置或失败时会自动回退到本地 OCR。无论哪种识别方式，结果都会进入确认表单，保存前可以手动修改。
 
 `.env` 可选配置：
 
 ```env
-# 免费优先：OpenRouter 支持 google/gemma-4-31b-it:free 等免费视觉模型
-OPENROUTER_API_KEY="你的 OpenRouter API Key"
-OPENROUTER_DATE_MODEL="google/gemma-4-31b-it:free"
-OPENROUTER_PROXY_URL="http://127.0.0.1:7897"
-
-# 备用：Gemini 免费层也支持图片理解
+# 优先：Gemini 免费层支持图片理解
 GEMINI_API_KEY="你的 Gemini API Key"
 GEMINI_DATE_MODEL="gemini-2.5-flash"
 GEMINI_PROXY_URL="http://127.0.0.1:7897"
+
+# 备用：OpenRouter 支持 google/gemma-4-31b-it:free 等免费视觉模型
+OPENROUTER_API_KEY="你的 OpenRouter API Key"
+OPENROUTER_DATE_MODEL="google/gemma-4-31b-it:free"
+OPENROUTER_PROXY_URL="http://127.0.0.1:7897"
 
 # 付费备用：OpenAI 有额度时可用
 OPENAI_API_KEY="你的 OpenAI API Key"

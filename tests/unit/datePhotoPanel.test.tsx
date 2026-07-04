@@ -44,6 +44,7 @@ describe("DatePhotoPanel", () => {
 
     expect(await screen.findByText("本地 OCR 已提取日期，请仔细确认后保存")).toBeVisible();
     expect(screen.getByText("识别原文（本地 OCR）")).toBeVisible();
+    expect(screen.getByText(/到期日：2027-12-31/)).toBeVisible();
     expect(screen.getByText(/大模型识别暂不可用/)).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue("2027-12-31"));
   });

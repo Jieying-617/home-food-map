@@ -44,7 +44,7 @@ export async function recognizePackageDateWithGemini({
 }: RecognizePackageDateWithGeminiInput): Promise<VisionDateResult> {
   const requestInit: RequestInit & { dispatcher?: unknown } = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-goog-api-key": apiKey },
     body: JSON.stringify({
       contents: [
         {
@@ -65,7 +65,7 @@ export async function recognizePackageDateWithGemini({
   const configuredProxyUrl = normalizeProxyUrl(proxyUrl);
   if (configuredProxyUrl) requestInit.dispatcher = proxyAgentFactory(configuredProxyUrl);
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   const response = await fetchImpl(url, requestInit);
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
@@ -77,3 +77,5 @@ export async function recognizePackageDateWithGemini({
   if (!outputText) throw new Error("Gemini date recognition returned no text");
   return normalizeVisionDateResult(JSON.parse(cleanJsonText(outputText)));
 }
+
+

@@ -29,20 +29,6 @@ export async function POST(request: Request) {
   const mimeType = file.type || "image/jpeg";
   const errors: string[] = [];
 
-  if (process.env.OPENROUTER_API_KEY) {
-    try {
-      const result = await recognizePackageDateWithOpenRouter({
-        apiKey: process.env.OPENROUTER_API_KEY,
-        imageBase64,
-        mimeType,
-        proxyUrl: getProxyUrl("openrouter"),
-      });
-      return NextResponse.json(result);
-    } catch (error) {
-      errors.push(getModelErrorMessage(error));
-    }
-  }
-
   if (process.env.GEMINI_API_KEY) {
     try {
       const result = await recognizePackageDateWithGemini({
@@ -50,6 +36,20 @@ export async function POST(request: Request) {
         imageBase64,
         mimeType,
         proxyUrl: getProxyUrl("gemini"),
+      });
+      return NextResponse.json(result);
+    } catch (error) {
+      errors.push(getModelErrorMessage(error));
+    }
+  }
+
+  if (process.env.OPENROUTER_API_KEY) {
+    try {
+      const result = await recognizePackageDateWithOpenRouter({
+        apiKey: process.env.OPENROUTER_API_KEY,
+        imageBase64,
+        mimeType,
+        proxyUrl: getProxyUrl("openrouter"),
       });
       return NextResponse.json(result);
     } catch (error) {

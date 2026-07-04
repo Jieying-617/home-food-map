@@ -28,9 +28,11 @@ describe("recognizePackageDateWithGemini", () => {
     });
 
     expect(result).toMatchObject({ expiryDate: "2027-12-31", confidence: "high" });
-    expect(fetchImpl.mock.calls[0][0]).toBe("https://generativelanguage.googleapis.com/v1beta/models/gemini-test:generateContent?key=gemini-key");
+    expect(fetchImpl.mock.calls[0][0]).toBe("https://generativelanguage.googleapis.com/v1beta/models/gemini-test:generateContent");
+    expect(fetchImpl.mock.calls[0][1].headers).toEqual(expect.objectContaining({ "X-goog-api-key": "gemini-key" }));
     const body = JSON.parse(fetchImpl.mock.calls[0][1].body as string);
     expect(body.contents[0].parts[1].inlineData).toEqual({ mimeType: "image/jpeg", data: "abc123" });
     expect(body.generationConfig.responseMimeType).toBe("application/json");
   });
 });
+

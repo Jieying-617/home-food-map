@@ -23,26 +23,10 @@ describe("POST /api/recognize-date", () => {
     openaiMock.mockReset();
   });
 
-  it("uses OpenRouter first when OPENROUTER_API_KEY is configured", async () => {
-    vi.stubEnv("OPENROUTER_API_KEY", "openrouter-key");
-    openRouterMock.mockResolvedValue({ productionDate: null, expiryDate: "2027-12-31", batchNumber: null, confidence: "high", rawText: "有效期至 2027.12", explanation: "OpenRouter 识别" });
-    const { POST } = await import("@/app/api/recognize-date/route");
-    const form = new FormData();
-    form.append("file", new File(["image"], "date.jpg", { type: "image/jpeg" }));
-    const response = await POST(new Request("http://localhost/api/recognize-date", { method: "POST", body: form }));
-    expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toMatchObject({ expiryDate: "2027-12-31" });
-    expect(openRouterMock).toHaveBeenCalled();
-    expect(geminiMock).not.toHaveBeenCalled();
-    expect(openaiMock).not.toHaveBeenCalled();
-  });
-
-  it("falls back from OpenRouter to Gemini, then skips OpenAI after Gemini succeeds", async () => {
+  it("uses Gemini first when Gemini and OpenRouter are both configured", async () => {
     vi.stubEnv("OPENROUTER_API_KEY", "openrouter-key");
     vi.stubEnv("GEMINI_API_KEY", "gemini-key");
-    vi.stubEnv("OPENAI_API_KEY", "openai-key");
-    openRouterMock.mockRejectedValue(new Error("OpenRouter date recognition failed: 429 rate limit"));
-    geminiMock.mockResolvedValue({ productionDate: null, expiryDate: "2027-12-31", batchNumber: null, confidence: "medium", rawText: "有效期至 2027.12", explanation: "Gemini fallback" });
+    geminiMock.mockResolvedValue({ productionDate: null, expiryDate: "2027-12-31", batchNumber: null, confidence: "high", rawText: "有效期至 2027.12", explanation: "Gemini 识别" });
     const { POST } = await import("@/app/api/recognize-date/route");
     const form = new FormData();
     form.append("file", new File(["image"], "date.jpg", { type: "image/jpeg" }));
@@ -50,6 +34,23 @@ describe("POST /api/recognize-date", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({ expiryDate: "2027-12-31" });
     expect(geminiMock).toHaveBeenCalled();
+    expect(openRouterMock).not.toHaveBeenCalled();
+    expect(openaiMock).not.toHaveBeenCalled();
+  });
+
+  it("falls back from Gemini to OpenRouter, then skips OpenAI after OpenRouter succeeds", async () => {
+    vi.stubEnv("OPENROUTER_API_KEY", "openrouter-key");
+    vi.stubEnv("GEMINI_API_KEY", "gemini-key");
+    vi.stubEnv("OPENAI_API_KEY", "openai-key");
+    geminiMock.mockRejectedValue(new Error("Gemini date recognition failed: 503 unavailable"));
+    openRouterMock.mockResolvedValue({ productionDate: null, expiryDate: "2027-12-31", batchNumber: null, confidence: "medium", rawText: "有效期至 2027.12", explanation: "OpenRouter fallback" });
+    const { POST } = await import("@/app/api/recognize-date/route");
+    const form = new FormData();
+    form.append("file", new File(["image"], "date.jpg", { type: "image/jpeg" }));
+    const response = await POST(new Request("http://localhost/api/recognize-date", { method: "POST", body: form }));
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ expiryDate: "2027-12-31" });
+    expect(openRouterMock).toHaveBeenCalled();
     expect(openaiMock).not.toHaveBeenCalled();
   });
 
@@ -57,8 +58,8 @@ describe("POST /api/recognize-date", () => {
     vi.stubEnv("OPENROUTER_API_KEY", "openrouter-key");
     vi.stubEnv("GEMINI_API_KEY", "gemini-key");
     vi.stubEnv("OPENAI_API_KEY", "openai-key");
-    openRouterMock.mockRejectedValue(new Error("OpenRouter date recognition failed: 429 rate limit"));
     geminiMock.mockRejectedValue(new Error("Gemini date recognition failed: 503 unavailable"));
+    openRouterMock.mockRejectedValue(new Error("OpenRouter date recognition failed: 429 rate limit"));
     openaiMock.mockResolvedValue({ productionDate: null, expiryDate: "2027-12-31", batchNumber: null, confidence: "medium", rawText: "有效期至 2027.12", explanation: "OpenAI fallback" });
     const { POST } = await import("@/app/api/recognize-date/route");
     const form = new FormData();

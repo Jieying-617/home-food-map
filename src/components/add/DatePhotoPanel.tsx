@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { parsePackageDate } from "@/lib/domain/dateParser";
+import { parsePackageDate, type ParsedPackageDate } from "@/lib/domain/dateParser";
 import { recognizeDateByVision, recognizeDateText, type VisionDateResult } from "@/lib/adapters/ocr";
 import { AddFoodConfirmForm, type ConfirmDraft } from "./AddFoodConfirmForm";
 
@@ -23,6 +23,18 @@ function describeVisionResult(result: VisionDateResult) {
   if (result.expiryDate) lines.push(`到期日：${result.expiryDate}`);
   if (result.explanation) lines.push(result.explanation);
   if (result.rawText) lines.push(`原文：${result.rawText}`);
+  return lines.join("\n");
+}
+
+function describeLocalOcrResult(text: string, parsed: ParsedPackageDate) {
+  const trimmed = text.trim();
+  if (parsed.confidence === "low") return trimmed;
+
+  const lines = [`到期日：${parsed.expiresAt}`];
+  if (parsed.source === "ocr-expiry-candidate") {
+    lines.push("中文标签识别不完整，已从完整日期候选中提取，请确认。");
+  }
+  if (trimmed) lines.push(`原文：${trimmed}`);
   return lines.join("\n");
 }
 
@@ -95,8 +107,8 @@ export function DatePhotoPanel({
     try {
       const text = await recognizeDateText(file);
       setRecognitionSource("本地 OCR");
-      setRecognizedText(text.trim());
       const parsed = parsePackageDate(text, new Date());
+      setRecognizedText(describeLocalOcrResult(text, parsed));
       const isLowConfidence = parsed.confidence === "low";
       setDraft(buildDraft(isLowConfidence ? "" : parsed.expiresAt, initialLocationId));
       setMessage(isLowConfidence ? "日期不太确定，请手动选择到期日" : "本地 OCR 已提取日期，请仔细确认后保存");

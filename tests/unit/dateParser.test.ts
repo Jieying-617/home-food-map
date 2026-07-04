@@ -18,6 +18,22 @@ describe("parsePackageDate", () => {
     });
   });
 
+  it("uses the latest complete OCR date candidate when labels are garbled", () => {
+    expect(parsePackageDate("team 20260113 03 com casi 2027. 12. -", new Date("2026-07-03"))).toEqual({
+      expiresAt: "2027-12-31",
+      confidence: "medium",
+      source: "ocr-expiry-candidate",
+    });
+  });
+
+  it("does not trust a noisy one-digit month candidate without a readable expiry label", () => {
+    expect(parsePackageDate("team 20260113 03 com casi 2027. 1. -", new Date("2026-07-03"))).toEqual({
+      expiresAt: "2026-07-03",
+      confidence: "low",
+      source: "unknown",
+    });
+  });
+
   it("calculates expiry from production date and shelf life in months", () => {
     expect(parsePackageDate("生产日期2026年1月1日 保质期12个月", new Date("2026-07-03"))).toEqual({
       expiresAt: "2027-01-01",
