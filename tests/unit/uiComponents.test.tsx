@@ -40,9 +40,9 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByText(/妈妈零食柜/)).toBeVisible();
     expect(screen.getByText(/2026-07-06/)).toBeVisible();
     expect(screen.getByText("还有 2 天")).toBeVisible();
-    expect(screen.getByRole("button", { name: /我拿了/ })).toBeVisible();
-    expect(screen.getByRole("button", { name: /吃完了/ })).toBeVisible();
-    expect(screen.getByRole("button", { name: /丢弃/ })).toBeVisible();
+    expect(screen.getByRole("button", { name: /消耗1包/ })).toBeVisible();
+    expect(screen.getByRole("button", { name: /全部消耗/ })).toBeVisible();
+    expect(screen.getByRole("button", { name: /全部丢弃/ })).toBeVisible();
   });
 
   it("links a location card to its detail page and summarizes active foods", () => {

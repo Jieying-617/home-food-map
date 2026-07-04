@@ -7,9 +7,9 @@ type PageProps = {
 
 const labels: Record<string, string> = {
   create: "新增",
-  take: "拿取",
-  finish: "吃完",
-  discard: "丢弃",
+  take: "消耗1件",
+  finish: "全部消耗",
+  discard: "全部丢弃",
 };
 
 export default async function RecordsPage({ params }: PageProps) {

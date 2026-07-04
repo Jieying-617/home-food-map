@@ -29,6 +29,10 @@ function formatQuantity(quantity: number) {
   return Number.isInteger(quantity) ? String(quantity) : String(quantity).replace(/\.0+$/, "");
 }
 
+function formatTakeLabel(unit: string) {
+  return `消耗1${unit}`;
+}
+
 export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) {
   const expiresAt = format(food.expiresAt, "yyyy-MM-dd");
   const notice = getExpiryNotice(expiresAt, today);
@@ -56,7 +60,7 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
         >
           <button className="flex min-h-12 w-full items-center justify-center gap-1 rounded-md bg-emerald-50 px-1 text-sm font-semibold text-emerald-800">
             <PackageCheck aria-hidden className="h-4 w-4 shrink-0" />
-            <span>我拿了</span>
+            <span>{formatTakeLabel(food.unit)}</span>
           </button>
         </form>
         <form
@@ -67,7 +71,7 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
         >
           <button className="flex min-h-12 w-full items-center justify-center gap-1 rounded-md bg-blue-50 px-1 text-sm font-semibold text-blue-800">
             <Utensils aria-hidden className="h-4 w-4 shrink-0" />
-            <span>吃完了</span>
+            <span>全部消耗</span>
           </button>
         </form>
         <form
@@ -78,7 +82,7 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
         >
           <button className="flex min-h-12 w-full items-center justify-center gap-1 rounded-md bg-rose-50 px-1 text-sm font-semibold text-rose-800">
             <Trash2 aria-hidden className="h-4 w-4 shrink-0" />
-            <span>丢弃</span>
+            <span>全部丢弃</span>
           </button>
         </form>
       </div>
