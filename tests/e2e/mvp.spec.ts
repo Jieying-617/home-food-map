@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("demo family can move through the trial MVP screens", async ({ page }) => {
   await page.goto("/f/demo");
   await expect(page.getByRole("heading", { name: "提醒中心" })).toBeVisible();
-  const reminderSummary = page.getByText("今日处理建议").locator("..")
+  const reminderSummary = page.getByText("今日处理建议").locator("..");
   await expect(reminderSummary.getByText("今天到期")).toBeVisible();
   await expect(reminderSummary.getByText("7 天内")).toBeVisible();
   await expect(page.getByRole("link", { name: "全部" })).toBeVisible();
@@ -19,4 +19,16 @@ test("demo family can move through the trial MVP screens", async ({ page }) => {
   await page.getByRole("link", { name: /家庭/ }).click();
   await expect(page.getByRole("heading", { name: "我们家" })).toBeVisible();
   await expect(page.getByText("妈妈")).toBeVisible();
+  await expect(page.getByText("WOJIA")).toBeVisible();
+
+  await page.getByRole("link", { name: "打开邀请链接" }).click();
+  await expect(page.getByRole("heading", { name: "加入家庭" })).toBeVisible();
+  await expect(page.getByLabel("邀请码")).toHaveValue("WOJIA");
+  await page.getByLabel("我的称呼").fill("测试成员");
+  await page.getByRole("button", { name: "加入家庭" }).click();
+  await expect(page.getByText("加入成功")).toBeVisible();
+
+  await page.getByRole("link", { name: "进入我们家" }).click();
+  await expect(page.getByRole("heading", { name: "我们家" })).toBeVisible();
+  await expect(page.getByText("测试成员")).toBeVisible();
 });
