@@ -28,17 +28,23 @@ function describeVisionResult(result: VisionDateResult) {
 
 function modelFailureMessage(error: unknown) {
   const message = error instanceof Error ? error.message : "";
-  if (message.includes("OPENAI_API_KEY")) {
-    return "大模型识别未启用：请先配置 OPENAI_API_KEY 并重启服务。当前仅使用本地 OCR，可能不准。";
+  if (message.includes("No model date recognition provider is configured")) {
+    return "大模型识别未启用：请先配置 OPENROUTER_API_KEY、GEMINI_API_KEY 或 OPENAI_API_KEY 并重启服务。当前仅使用本地 OCR，可能不准。";
   }
-  if (message.includes("insufficient_quota") || message.includes("exceeded your current quota") || message.includes("429")) {
+  if (message.includes("OPENAI_API_KEY")) {
+    return "OpenAI 识别未启用：请先配置 OPENAI_API_KEY 并重启服务。当前仅使用本地 OCR，可能不准。";
+  }
+  if (message.includes("insufficient_quota") || message.includes("exceeded your current quota")) {
     return "OpenAI API 额度不足：请检查账号计费或充值。当前仅使用本地 OCR，可能不准。";
   }
+  if (message.includes("rate limit") || message.includes("429")) {
+    return "免费大模型暂时限流：可以稍后重试，或配置 Gemini/OpenAI 作为备用。当前仅使用本地 OCR，可能不准。";
+  }
   if (message.includes("invalid_api_key") || message.includes("401")) {
-    return "OpenAI API Key 无效：请检查 .env 中的 OPENAI_API_KEY 并重启服务。当前仅使用本地 OCR，可能不准。";
+    return "大模型 API Key 无效：请检查 .env 中的 OpenRouter/Gemini/OpenAI key 并重启服务。当前仅使用本地 OCR，可能不准。";
   }
   if (message.includes("connect") || message.includes("timeout") || message.includes("fetch failed")) {
-    return "大模型识别连接失败：请检查 OPENAI_PROXY_URL 或网络代理。当前仅使用本地 OCR，可能不准。";
+    return "大模型识别连接失败：请检查代理或网络。当前仅使用本地 OCR，可能不准。";
   }
   return "大模型识别暂不可用：当前仅使用本地 OCR，可能不准。";
 }
