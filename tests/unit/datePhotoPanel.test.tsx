@@ -42,8 +42,9 @@ describe("DatePhotoPanel", () => {
     render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
     uploadImage();
 
-    expect(await screen.findByText("已识别日期，请确认后保存")).toBeVisible();
+    expect(await screen.findByText("本地 OCR 已提取日期，请仔细确认后保存")).toBeVisible();
     expect(screen.getByText("识别原文（本地 OCR）")).toBeVisible();
+    expect(screen.getByText(/大模型识别未启用或暂不可用/)).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue("2027-12-31"));
   });
 
@@ -58,4 +59,6 @@ describe("DatePhotoPanel", () => {
     await waitFor(() => expect(screen.getByLabelText("到期日")).toHaveValue(""));
   });
 });
+
+
 
