@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { createFood } from "@/lib/server/foods";
 
@@ -18,9 +19,21 @@ type AddFoodConfirmFormProps = {
   draft: ConfirmDraft;
 };
 
+function nextBlankDraft(draft: ConfirmDraft, locationId: string): ConfirmDraft {
+  return {
+    ...draft,
+    name: "",
+    quantity: 1,
+    unit: "件",
+    locationId,
+    expiresAt: "",
+  };
+}
+
 export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfirmFormProps) {
   const [form, setForm] = useState(draft);
   const [message, setMessage] = useState("");
+  const [savedLocationId, setSavedLocationId] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   async function save() {
@@ -39,12 +52,19 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         unit: form.unit.trim() || "件",
         quantity: Number.isFinite(form.quantity) && form.quantity > 0 ? form.quantity : 1,
       });
+      setSavedLocationId(form.locationId);
       setMessage("已保存");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "保存失败，请稍后再试");
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function continueAdding() {
+    setForm(nextBlankDraft(draft, savedLocationId || form.locationId));
+    setMessage("");
+    setSavedLocationId("");
   }
 
   return (
@@ -115,6 +135,23 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         {isSaving ? "保存中" : "确认保存"}
       </button>
       {message ? <p className="text-sm text-slate-700">{message}</p> : null}
+      {savedLocationId ? (
+        <div className="grid grid-cols-2 gap-3 rounded-md bg-emerald-50 p-3">
+          <button
+            className="min-h-11 rounded-md bg-white px-3 text-sm font-bold text-emerald-800"
+            type="button"
+            onClick={continueAdding}
+          >
+            继续添加
+          </button>
+          <Link
+            className="flex min-h-11 items-center justify-center rounded-md bg-emerald-700 px-3 text-sm font-bold text-white"
+            href={`/f/${familyId}/locations/${savedLocationId}`}
+          >
+            查看这个位置
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

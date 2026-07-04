@@ -10,8 +10,24 @@ export type ExpiryGroups = {
   later: FoodSummary[];
 };
 
+export type ExpiryNotice = {
+  days: number;
+  label: string;
+  tone: "expired" | "today" | "soon" | "warning" | "normal" | "later";
+};
+
 export function daysUntilExpiry(expiresAt: string, today: Date): number {
   return differenceInCalendarDays(parseISO(expiresAt), today);
+}
+
+export function getExpiryNotice(expiresAt: string, today: Date): ExpiryNotice {
+  const days = daysUntilExpiry(expiresAt, today);
+  if (days < 0) return { days, label: `已过期 ${Math.abs(days)} 天`, tone: "expired" };
+  if (days === 0) return { days, label: "今天到期", tone: "today" };
+  if (days <= 3) return { days, label: `还有 ${days} 天`, tone: "soon" };
+  if (days <= 7) return { days, label: `还有 ${days} 天`, tone: "warning" };
+  if (days <= 30) return { days, label: `还有 ${days} 天`, tone: "normal" };
+  return { days, label: `${days} 天后`, tone: "later" };
 }
 
 export function groupExpiry(items: FoodSummary[], today: Date): ExpiryGroups {

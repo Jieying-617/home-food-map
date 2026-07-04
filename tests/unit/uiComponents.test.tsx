@@ -19,16 +19,17 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByRole("link", { name: /家庭/ })).toHaveAttribute("href", "/f/demo/family");
   });
 
-  it("shows food details and one-tap action buttons", () => {
+  it("shows food details, expiry notice, and one-tap action buttons", () => {
     render(
       <FoodCard
         familyId="demo"
+        today={new Date("2026-07-04T00:00:00+08:00")}
         food={{
           id: "food-1",
           name: "蛋黄派",
           quantity: 3,
           unit: "包",
-          expiresAt: new Date("2026-08-20T00:00:00+08:00"),
+          expiresAt: new Date("2026-07-06T00:00:00+08:00"),
           location: { name: "妈妈零食柜" },
         }}
       />,
@@ -37,7 +38,8 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByRole("heading", { name: "蛋黄派" })).toBeVisible();
     expect(screen.getByText(/3包/)).toBeVisible();
     expect(screen.getByText(/妈妈零食柜/)).toBeVisible();
-    expect(screen.getByText(/2026-08-20/)).toBeVisible();
+    expect(screen.getByText(/2026-07-06/)).toBeVisible();
+    expect(screen.getByText("还有 2 天")).toBeVisible();
     expect(screen.getByRole("button", { name: /我拿了/ })).toBeVisible();
     expect(screen.getByRole("button", { name: /吃完了/ })).toBeVisible();
     expect(screen.getByRole("button", { name: /丢弃/ })).toBeVisible();

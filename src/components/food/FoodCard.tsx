@@ -1,9 +1,11 @@
 import { format } from "date-fns";
 import { PackageCheck, Trash2, Utensils } from "lucide-react";
+import { getExpiryNotice } from "@/lib/domain/expiry";
 import { performFoodAction } from "@/lib/server/foods";
 
 type FoodCardProps = {
   familyId: string;
+  today?: Date;
   food: {
     id: string;
     name: string;
@@ -14,12 +16,22 @@ type FoodCardProps = {
   };
 };
 
+const noticeClass = {
+  expired: "bg-red-100 text-red-800",
+  today: "bg-red-100 text-red-800",
+  soon: "bg-orange-100 text-orange-800",
+  warning: "bg-yellow-100 text-yellow-800",
+  normal: "bg-emerald-50 text-emerald-800",
+  later: "bg-slate-100 text-slate-700",
+};
+
 function formatQuantity(quantity: number) {
   return Number.isInteger(quantity) ? String(quantity) : String(quantity).replace(/\.0+$/, "");
 }
 
-export function FoodCard({ familyId, food }: FoodCardProps) {
+export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) {
   const expiresAt = format(food.expiresAt, "yyyy-MM-dd");
+  const notice = getExpiryNotice(expiresAt, today);
 
   return (
     <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -31,6 +43,9 @@ export function FoodCard({ familyId, food }: FoodCardProps) {
           </p>
           <p className="mt-1 text-sm text-slate-600">到期：{expiresAt}</p>
         </div>
+        <span className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${noticeClass[notice.tone]}`}>
+          {notice.label}
+        </span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
         <form

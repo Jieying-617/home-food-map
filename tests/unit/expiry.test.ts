@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupExpiry } from "@/lib/domain/expiry";
+import { getExpiryNotice, groupExpiry } from "@/lib/domain/expiry";
 
 describe("groupExpiry", () => {
   it("groups active foods by urgency and ignores resolved foods", () => {
@@ -17,5 +17,16 @@ describe("groupExpiry", () => {
     expect(grouped.within3Days.map((item) => item.name)).toEqual(["蛋黄派"]);
     expect(grouped.within30Days.map((item) => item.name)).toEqual(["坚果"]);
     expect(grouped.expired).toEqual([]);
+  });
+});
+
+describe("getExpiryNotice", () => {
+  const today = new Date("2026-07-04T00:00:00+08:00");
+
+  it("formats overdue, today, and remaining-day reminders", () => {
+    expect(getExpiryNotice("2026-07-02", today)).toMatchObject({ label: "已过期 2 天", tone: "expired" });
+    expect(getExpiryNotice("2026-07-04", today)).toMatchObject({ label: "今天到期", tone: "today" });
+    expect(getExpiryNotice("2026-07-06", today)).toMatchObject({ label: "还有 2 天", tone: "soon" });
+    expect(getExpiryNotice("2026-08-20", today)).toMatchObject({ label: "47 天后", tone: "later" });
   });
 });
