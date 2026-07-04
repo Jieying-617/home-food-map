@@ -69,4 +69,15 @@ describe("DatePhotoPanel", () => {
     expect(await screen.findByText(/OpenAI API 额度不足/)).toBeVisible();
     expect(screen.getByText(/检查账号计费或充值/)).toBeVisible();
   });
+  it("prioritizes OpenRouter rate-limit guidance over OpenAI fallback quota errors", async () => {
+    vi.mocked(recognizeDateByVision).mockRejectedValue(new Error("OpenRouter date recognition failed: 429 google/gemma-4-31b-it:free is temporarily rate-limited upstream；OpenAI date recognition failed: 429 insufficient_quota"));
+    vi.mocked(recognizeDateText).mockResolvedValue("【有效期】至 2027.12.");
+
+    render(<DatePhotoPanel familyId="demo" locations={[{ id: "loc-1", name: "妈妈零食柜" }]} />);
+    uploadImage();
+
+    expect(await screen.findByText(/OpenRouter 免费模型暂时限流/)).toBeVisible();
+    expect(screen.queryByText(/OpenAI API 额度不足/)).not.toBeInTheDocument();
+  });
 });
+
