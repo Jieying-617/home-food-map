@@ -5,9 +5,11 @@ import { AddFoodConfirmForm } from "./AddFoodConfirmForm";
 export function ManualEntryPanel({
   familyId,
   locations,
+  initialLocationId = "",
 }: {
   familyId: string;
   locations: Array<{ id: string; name: string }>;
+  initialLocationId?: string;
 }) {
   return (
     <section>
@@ -15,7 +17,7 @@ export function ManualEntryPanel({
       <AddFoodConfirmForm
         familyId={familyId}
         locations={locations}
-        draft={{ name: "", quantity: 1, unit: "件", locationId: "", expiresAt: "", source: "manual" }}
+        draft={{ name: "", quantity: 1, unit: "件", locationId: initialLocationId, expiresAt: "", source: "manual" }}
       />
     </section>
   );

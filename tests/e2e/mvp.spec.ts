@@ -11,7 +11,11 @@ test("demo family can move through the trial MVP screens", async ({ page }) => {
 
   await page.getByRole("link", { name: /位置/ }).click();
   await expect(page.getByRole("heading", { name: "位置地图" })).toBeVisible();
-  await expect(page.getByText("妈妈零食柜")).toBeVisible();
+  await page.getByRole("link", { name: /妈妈零食柜/ }).click();
+  await expect(page.getByRole("heading", { name: "妈妈零食柜" })).toBeVisible();
+  await page.getByRole("link", { name: "添加到这里" }).click();
+  await expect(page.getByRole("heading", { name: "添加食物" })).toBeVisible();
+  await expect(page.getByLabel("存放位置").last()).toHaveValue(/.+/);
 
   await page.getByRole("link", { name: /记录/ }).click();
   await expect(page.getByRole("heading", { name: "操作记录" })).toBeVisible();

@@ -5,12 +5,12 @@ import { parsePackageDate } from "@/lib/domain/dateParser";
 import { recognizeDateByVision, recognizeDateText, type VisionDateResult } from "@/lib/adapters/ocr";
 import { AddFoodConfirmForm, type ConfirmDraft } from "./AddFoodConfirmForm";
 
-function buildDraft(expiresAt: string): ConfirmDraft {
+function buildDraft(expiresAt: string, locationId = ""): ConfirmDraft {
   return {
     name: "",
     quantity: 1,
     unit: "件",
-    locationId: "",
+    locationId,
     expiresAt,
     source: "date-photo",
   };
@@ -36,9 +36,11 @@ function modelFailureMessage(error: unknown) {
 export function DatePhotoPanel({
   familyId,
   locations,
+  initialLocationId = "",
 }: {
   familyId: string;
   locations: Array<{ id: string; name: string }>;
+  initialLocationId?: string;
 }) {
   const [draft, setDraft] = useState<ConfirmDraft | null>(null);
   const [message, setMessage] = useState("");
@@ -57,7 +59,7 @@ export function DatePhotoPanel({
       const vision = await recognizeDateByVision(file);
       setRecognitionSource("大模型识别");
       setRecognizedText(describeVisionResult(vision));
-      setDraft(buildDraft(vision.confidence === "low" ? "" : vision.expiryDate ?? ""));
+      setDraft(buildDraft(vision.confidence === "low" ? "" : vision.expiryDate ?? "", initialLocationId));
       setMessage(vision.expiryDate && vision.confidence !== "low" ? "已识别日期，请确认后保存" : "日期不太确定，请手动选择到期日");
       return;
     } catch (error) {
@@ -70,11 +72,11 @@ export function DatePhotoPanel({
       setRecognizedText(text.trim());
       const parsed = parsePackageDate(text, new Date());
       const isLowConfidence = parsed.confidence === "low";
-      setDraft(buildDraft(isLowConfidence ? "" : parsed.expiresAt));
+      setDraft(buildDraft(isLowConfidence ? "" : parsed.expiresAt, initialLocationId));
       setMessage(isLowConfidence ? "日期不太确定，请手动选择到期日" : "本地 OCR 已提取日期，请仔细确认后保存");
     } catch {
       setMessage("识别失败，请手动选择到期日");
-      setDraft(buildDraft(""));
+      setDraft(buildDraft("", initialLocationId));
     }
   }
 

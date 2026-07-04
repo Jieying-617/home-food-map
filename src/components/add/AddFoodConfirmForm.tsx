@@ -142,7 +142,7 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
             type="button"
             onClick={continueAdding}
           >
-            继续添加
+            继续添加同位置
           </button>
           <Link
             className="flex min-h-11 items-center justify-center rounded-md bg-emerald-700 px-3 text-sm font-bold text-white"

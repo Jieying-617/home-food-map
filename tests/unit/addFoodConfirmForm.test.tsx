@@ -66,7 +66,27 @@ describe("AddFoodConfirmForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "确认保存" }));
 
     expect(await screen.findByText("已保存"));
-    expect(screen.getByRole("button", { name: "继续添加" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "继续添加同位置" })).toBeVisible();
     expect(screen.getByRole("link", { name: "查看这个位置" })).toHaveAttribute("href", "/f/demo/locations/loc-1");
+  });
+  it("keeps the saved location while clearing fields for the next food", async () => {
+    vi.mocked(createFood).mockResolvedValue({ id: "food-1" } as never);
+
+    render(
+      <AddFoodConfirmForm
+        familyId="demo"
+        locations={[{ id: "loc-1", name: "妈妈零食柜" }]}
+        draft={{ name: "海苔卷", quantity: 2, unit: "包", locationId: "loc-1", expiresAt: "2026-07-20", source: "manual" }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "确认保存" }));
+    await screen.findByText("已保存");
+    fireEvent.click(screen.getByRole("button", { name: "继续添加同位置" }));
+
+    expect(screen.getByLabelText("存放位置")).toHaveValue("loc-1");
+    expect(screen.getByLabelText("到期日")).toHaveValue("");
+    expect(screen.getByDisplayValue("件")).toBeVisible();
+    expect(screen.queryByDisplayValue("海苔卷")).not.toBeInTheDocument();
   });
 });

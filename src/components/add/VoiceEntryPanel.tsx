@@ -8,9 +8,11 @@ import { AddFoodConfirmForm, type ConfirmDraft } from "./AddFoodConfirmForm";
 export function VoiceEntryPanel({
   familyId,
   locations,
+  initialLocationId = "",
 }: {
   familyId: string;
   locations: Array<{ id: string; name: string }>;
+  initialLocationId?: string;
 }) {
   const [draft, setDraft] = useState<ConfirmDraft | null>(null);
   const [message, setMessage] = useState("");
@@ -33,7 +35,7 @@ export function VoiceEntryPanel({
         name: parsed.name,
         quantity: parsed.quantity,
         unit: parsed.unit,
-        locationId: matchedLocation?.id ?? "",
+        locationId: matchedLocation?.id ?? initialLocationId,
         expiresAt: parsed.expiresAt,
         source: "voice",
       });
