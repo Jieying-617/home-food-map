@@ -65,4 +65,50 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByText("蛋黄派")).toBeVisible();
     expect(screen.getByText(/最近到期：2026\/8\/20/)).toBeVisible();
   });
+  it("summarizes cabinet expiry risk with clear priority badges", () => {
+    render(
+      <LocationCard
+        familyId="demo"
+        today={new Date("2026-07-04T00:00:00+08:00")}
+        location={{
+          id: "loc-1",
+          name: "妈妈零食柜",
+          sketchCoverUrl: null,
+          photoUrl: null,
+          foods: [
+            { name: "过期饼干", expiresAt: new Date("2026-07-02T00:00:00+08:00") },
+            { name: "今天牛奶", expiresAt: new Date("2026-07-04T00:00:00+08:00") },
+            { name: "蛋黄派", expiresAt: new Date("2026-07-08T00:00:00+08:00") },
+            { name: "坚果", expiresAt: new Date("2026-07-25T00:00:00+08:00") },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByText("已过期 1 件")).toBeVisible();
+    expect(screen.getByText("今天到期 1 件")).toBeVisible();
+    expect(screen.getByText("7 天内 1 件")).toBeVisible();
+    expect(screen.getByText("30 天内 1 件")).toBeVisible();
+    expect(screen.getByText("先处理：过期饼干")).toBeVisible();
+  });
+
+  it("shows a calm cabinet status when nothing is urgent", () => {
+    render(
+      <LocationCard
+        familyId="demo"
+        today={new Date("2026-07-04T00:00:00+08:00")}
+        location={{
+          id: "loc-1",
+          name: "妈妈零食柜",
+          sketchCoverUrl: null,
+          photoUrl: null,
+          foods: [{ name: "坚果", expiresAt: new Date("2026-09-20T00:00:00+08:00") }],
+        }}
+      />,
+    );
+
+    expect(screen.getByText("暂无急事")).toBeVisible();
+    expect(screen.getByText("最早到期：坚果")).toBeVisible();
+  });
 });
+
