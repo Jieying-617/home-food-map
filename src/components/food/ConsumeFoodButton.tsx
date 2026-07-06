@@ -33,7 +33,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
   return (
     <div className="relative">
       <button
-        className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-teal-50 px-2 pr-8 text-sm font-bold text-teal-800 hover:bg-teal-100 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-[var(--color-primary-soft)] px-2 pr-8 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)] disabled:cursor-not-allowed disabled:opacity-60"
         type="button"
         disabled={isPending}
         onClick={() => consume(1)}
@@ -44,7 +44,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
       <button
         aria-expanded={isOpen}
         aria-label="更多消耗数量"
-        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/85 text-teal-900 shadow-sm hover:bg-white"
+        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/85 text-[var(--color-primary-strong)] shadow-sm hover:bg-white"
         type="button"
         onClick={(event) => {
           event.stopPropagation();
@@ -61,7 +61,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
             {[0.5, 1, 2].map((quantity) => (
               <button
                 key={quantity}
-                className="min-h-10 rounded-md bg-teal-50 px-2 text-sm font-bold text-teal-800 hover:bg-teal-100 disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-10 rounded-md bg-[var(--color-primary-soft)] px-2 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)] disabled:cursor-not-allowed disabled:opacity-60"
                 type="button"
                 disabled={isPending}
                 onClick={() => consume(quantity)}

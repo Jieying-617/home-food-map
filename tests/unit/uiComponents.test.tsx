@@ -20,7 +20,7 @@ describe("Task 4 inventory UI components", () => {
   });
 
   it("shows food details, expiry notice, and one-tap action buttons", () => {
-    render(
+    const { container } = render(
       <FoodCard
         familyId="demo"
         today={new Date("2026-07-04T00:00:00+08:00")}
@@ -44,6 +44,8 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByRole("button", { name: "更多消耗数量" })).toBeVisible();
     expect(screen.getByRole("button", { name: /全部吃完/ })).toBeVisible();
     expect(screen.getByRole("button", { name: /丢弃/ })).toBeVisible();
+    expect(container.innerHTML).not.toMatch(/bg-(teal|sky|rose|orange|amber|red)-50/);
+    expect(container.innerHTML).not.toMatch(/text-(teal|sky|rose|orange|amber|red)-800/);
   });
 
   it("links a location card to its detail page and summarizes active foods", () => {

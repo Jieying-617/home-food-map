@@ -18,11 +18,11 @@ type FoodCardProps = {
 };
 
 const noticeClass = {
-  expired: "border-red-200 bg-red-50 text-red-800",
-  today: "border-red-200 bg-red-50 text-red-800",
-  soon: "border-orange-200 bg-orange-50 text-orange-800",
-  warning: "border-amber-200 bg-amber-50 text-amber-800",
-  normal: "border-teal-200 bg-teal-50 text-teal-800",
+  expired: "border-[color-mix(in_srgb,var(--color-destructive)_30%,white)] bg-[color-mix(in_srgb,var(--color-destructive)_10%,white)] text-[var(--color-destructive)]",
+  today: "border-[color-mix(in_srgb,var(--color-destructive)_30%,white)] bg-[color-mix(in_srgb,var(--color-destructive)_10%,white)] text-[var(--color-destructive)]",
+  soon: "border-[color-mix(in_srgb,var(--color-accent)_30%,white)] bg-[var(--color-accent-soft)] text-[color-mix(in_srgb,var(--color-accent)_72%,black)]",
+  warning: "border-[color-mix(in_srgb,var(--color-accent)_24%,white)] bg-[var(--color-accent-soft)] text-[color-mix(in_srgb,var(--color-accent)_68%,black)]",
+  normal: "border-[color-mix(in_srgb,var(--color-primary)_24%,white)] bg-[var(--color-primary-soft)] text-[var(--color-primary-strong)]",
   later: "border-slate-200 bg-slate-50 text-slate-700",
 };
 
@@ -67,7 +67,7 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
           }}
         >
           <button
-            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-sky-50 px-2 text-sm font-bold text-sky-800 hover:bg-sky-100"
+            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-[var(--color-primary-soft)] px-2 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)]"
             type="submit"
           >
             <Utensils aria-hidden className="h-4 w-4 shrink-0" />
@@ -81,7 +81,7 @@ export function FoodCard({ familyId, food, today = new Date() }: FoodCardProps) 
           }}
         >
           <button
-            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-50 px-2 text-sm font-bold text-rose-800 hover:bg-rose-100"
+            className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-[color-mix(in_srgb,var(--color-destructive)_10%,white)] px-2 text-sm font-bold text-[var(--color-destructive)] hover:bg-[color-mix(in_srgb,var(--color-destructive)_16%,white)]"
             type="submit"
           >
             <Trash2 aria-hidden className="h-4 w-4 shrink-0" />
