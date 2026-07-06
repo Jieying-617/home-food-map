@@ -68,7 +68,7 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByText(/最近到期：2026\/8\/20/)).toBeVisible();
   });
   it("summarizes cabinet expiry risk with clear priority badges", () => {
-    render(
+    const { container } = render(
       <LocationCard
         familyId="demo"
         today={new Date("2026-07-04T00:00:00+08:00")}
@@ -92,6 +92,8 @@ describe("Task 4 inventory UI components", () => {
     expect(screen.getByText("7 天内 1 件")).toBeVisible();
     expect(screen.getByText("30 天内 1 件")).toBeVisible();
     expect(screen.getByText("先处理：过期饼干")).toBeVisible();
+    expect(container.innerHTML).not.toMatch(/bg-(teal|sky|rose|orange|amber|red)-50/);
+    expect(container.innerHTML).not.toMatch(/text-(teal|sky|rose|orange|amber|red)-800/);
   });
 
   it("shows a calm cabinet status when nothing is urgent", () => {

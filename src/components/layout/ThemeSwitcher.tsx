@@ -8,50 +8,50 @@ const themes = [
     id: "strawberry",
     label: "D",
     name: "米白草莓",
-    description: "当前偏好，软萌明亮",
-    colors: ["#FFFCF7", "#F472B6", "#2DD4BF"],
+    description: "柔和浆果，少量粉调",
+    colors: ["#fbf7f1", "#b45f7d", "#8fae9f"],
   },
   {
     id: "provence-linen",
     label: "K",
     name: "法式亚麻",
     description: "薰衣草、鼠尾草、奶白",
-    colors: ["#FFFCF5", "#7C6A9A", "#8FAE7E"],
+    colors: ["#fbf7ef", "#746582", "#879a78"],
   },
   {
     id: "tuscan-pantry",
     label: "L",
     name: "托斯卡纳",
     description: "橄榄绿、番茄红、陶罐感",
-    colors: ["#FFF9EF", "#6B8E23", "#C65D3A"],
+    colors: ["#fbf4e8", "#697844", "#a7654b"],
   },
   {
     id: "olive-terracotta",
     label: "M",
     name: "橄榄陶土",
     description: "乡村厨房，温暖但克制",
-    colors: ["#FBFAF4", "#708238", "#B86B4B"],
+    colors: ["#f8f5ed", "#6d7545", "#9f6a51"],
   },
   {
     id: "strawberry-pudding",
     label: "H",
     name: "草莓奶冻",
     description: "更柔和，更耐看",
-    colors: ["#FFF9F6", "#E85D8F", "#FB923C"],
+    colors: ["#fbf5f0", "#b86b86", "#bd8360"],
   },
   {
     id: "peach-bento",
     label: "J",
     name: "桃子便当",
     description: "更食物，更温暖",
-    colors: ["#FFFBF4", "#F97373", "#A7F3D0"],
+    colors: ["#fbf6ee", "#b96f65", "#9cac86"],
   },
   {
     id: "cherry-yogurt",
     label: "I",
     name: "樱桃酸奶",
     description: "更活泼，更明亮",
-    colors: ["#FFFDFB", "#E11D48", "#FEF3C7"],
+    colors: ["#fbf8f3", "#a94e60", "#d8c98f"],
   },
 ] as const;
 
@@ -83,7 +83,7 @@ export function ThemeSwitcher() {
   const activeThemeName = themes.find((theme) => theme.id === activeTheme)?.name ?? "法式亚麻";
 
   return (
-    <section className="linen-stripe rounded-lg border border-[var(--color-border)] p-3 transition-colors">
+    <section className="surface-card linen-stripe p-3 transition-colors">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-black text-slate-950">配色试衣间</p>
@@ -105,7 +105,7 @@ export function ThemeSwitcher() {
                 "group min-h-16 cursor-pointer rounded-md border p-3 text-left transition-all duration-200 active:scale-[0.98]",
                 isActive
                   ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] shadow-[0_0_0_3px_var(--color-accent-soft)]"
-                  : "border-[var(--color-border)] bg-white hover:border-[var(--color-primary)] hover:bg-[var(--color-muted)]",
+                  : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)] hover:bg-[var(--color-muted)]",
               ].join(" ")}
               onClick={() => setActiveTheme(theme.id)}
             >

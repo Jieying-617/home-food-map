@@ -33,7 +33,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
   return (
     <div className="relative">
       <button
-        className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-md bg-[var(--color-primary-soft)] px-2 pr-8 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-quiet min-h-12 w-full gap-1 px-2 pr-8 text-sm"
         type="button"
         disabled={isPending}
         onClick={() => consume(1)}
@@ -44,7 +44,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
       <button
         aria-expanded={isOpen}
         aria-label="更多消耗数量"
-        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/85 text-[var(--color-primary-strong)] shadow-sm hover:bg-white"
+        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-primary-strong)] shadow-sm hover:bg-[var(--color-muted)]"
         type="button"
         onClick={(event) => {
           event.stopPropagation();
@@ -55,13 +55,13 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
       </button>
 
       {isOpen ? (
-        <div className="absolute left-0 right-0 top-14 z-20 rounded-lg border border-[var(--color-border)] bg-white p-2 shadow-lg">
+        <div className="surface-card absolute left-0 right-0 top-14 z-20 p-2 shadow-lg">
           <p className="px-2 pb-2 text-xs font-bold text-slate-500">选择消耗数量</p>
           <div className="grid grid-cols-3 gap-1">
             {[0.5, 1, 2].map((quantity) => (
               <button
                 key={quantity}
-                className="min-h-10 rounded-md bg-[var(--color-primary-soft)] px-2 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-quiet min-h-10 px-2 text-sm"
                 type="button"
                 disabled={isPending}
                 onClick={() => consume(quantity)}
@@ -74,7 +74,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
           <div className="mt-2 flex gap-2">
             <input
               aria-label="自定义消耗数量"
-              className="min-h-10 min-w-0 flex-1 rounded-md border border-slate-300 px-2 text-sm text-slate-950"
+              className="field-control min-h-10 min-w-0 flex-1 px-2 text-sm"
               inputMode="decimal"
               min="0.1"
               step="0.1"
@@ -83,7 +83,7 @@ export function ConsumeFoodButton({ familyId, foodId, unit }: ConsumeFoodButtonP
               onChange={(event) => setCustomQuantity(event.target.value)}
             />
             <button
-              className="min-h-10 rounded-md bg-slate-950 px-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="btn-dark min-h-10 px-3 text-sm"
               type="button"
               disabled={isPending || !canUseCustomQuantity}
               onClick={() => consume(parsedCustomQuantity)}

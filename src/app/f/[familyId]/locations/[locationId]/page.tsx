@@ -30,7 +30,7 @@ export default async function LocationDetailPage({ params }: PageProps) {
         action={
           <Link
             href={`/f/${familyId}/add?locationId=${locationId}`}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-bold text-white hover:opacity-90"
+            className="btn-accent text-sm"
           >
             <Plus aria-hidden className="h-4 w-4" />
             添加到这里
@@ -43,7 +43,7 @@ export default async function LocationDetailPage({ params }: PageProps) {
           <FoodCard key={food.id} familyId={familyId} food={food} />
         ))}
         {foods.length === 0 ? (
-          <div className="rounded-lg border border-[var(--color-border)] bg-white p-6 text-center lg:col-span-2">
+          <div className="empty-state lg:col-span-2">
             <p className="text-lg font-black text-slate-950">这个位置暂时没有在库食物</p>
             <p className="mt-2 text-sm text-slate-600">下次收纳时可以直接添加到这里。</p>
           </div>

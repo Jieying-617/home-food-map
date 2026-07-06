@@ -39,7 +39,7 @@ export function JoinFamilyForm({ initialInviteCode = "" }: { initialInviteCode?:
         <span className="mb-1 block text-sm font-bold text-slate-700">邀请码</span>
         <input
           aria-label="邀请码"
-          className="min-h-12 w-full rounded-md border border-slate-300 p-3 text-lg font-bold uppercase tracking-wide"
+          className="field-control text-lg font-bold uppercase tracking-wide"
           value={inviteCode}
           placeholder="例如：WOJIA"
           onChange={(event) => setInviteCode(event.target.value)}
@@ -49,14 +49,14 @@ export function JoinFamilyForm({ initialInviteCode = "" }: { initialInviteCode?:
         <span className="mb-1 block text-sm font-bold text-slate-700">我的称呼</span>
         <input
           aria-label="我的称呼"
-          className="min-h-12 w-full rounded-md border border-slate-300 p-3"
+          className="field-control"
           value={nickname}
           placeholder="例如：妈妈、爸爸、我"
           onChange={(event) => setNickname(event.target.value)}
         />
       </label>
       <button
-        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 font-bold text-white hover:bg-[var(--color-primary-strong)] disabled:cursor-not-allowed disabled:bg-slate-300"
+        className="btn-primary w-full"
         type="button"
         disabled={isSaving}
         onClick={join}
@@ -64,10 +64,10 @@ export function JoinFamilyForm({ initialInviteCode = "" }: { initialInviteCode?:
         <LogIn aria-hidden className="h-4 w-4" />
         {isSaving ? "加入中..." : "加入家庭"}
       </button>
-      {message ? <p className="text-sm font-semibold text-slate-700">{message}</p> : null}
+      {message ? <p className="status-note">{message}</p> : null}
       {joinedFamilyId ? (
         <Link
-          className="block min-h-12 rounded-md bg-slate-950 px-4 py-3 text-center font-bold text-white hover:bg-slate-800"
+          className="btn-dark w-full"
           href={`/f/${joinedFamilyId}/family`}
         >
           进入我们家

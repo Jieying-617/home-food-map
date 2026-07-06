@@ -13,9 +13,9 @@ export function ManualEntryPanel({
   initialLocationId?: string;
 }) {
   return (
-    <section className="rounded-lg border border-[var(--color-border)] bg-white p-4">
+    <section className="surface-card p-4">
       <div className="mb-3 flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+        <div className="icon-tile">
           <Keyboard aria-hidden className="h-5 w-5" />
         </div>
         <div>

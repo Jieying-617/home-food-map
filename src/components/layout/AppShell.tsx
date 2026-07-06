@@ -15,7 +15,7 @@ type PageHeaderProps = {
 export function AppShell({ children, bottomNav }: AppShellProps) {
   return (
     <main className="app-fabric min-h-screen pb-28 text-[var(--color-foreground)]">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 pb-6 pt-5 sm:px-6 lg:px-8">
+      <div className="app-stack mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 pb-6 pt-5 sm:px-6 lg:px-8">
         {children}
       </div>
       {bottomNav}
@@ -25,7 +25,7 @@ export function AppShell({ children, bottomNav }: AppShellProps) {
 
 export function PageHeader({ eyebrow, title, description, action }: PageHeaderProps) {
   return (
-    <header className="french-header flex flex-col gap-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 pt-6 sm:flex-row sm:items-end sm:justify-between sm:p-5 sm:pt-7">
+    <header className="french-header surface-card flex flex-col gap-4 p-4 pt-6 sm:flex-row sm:items-end sm:justify-between sm:p-5 sm:pt-7">
       <div className="min-w-0">
         {eyebrow ? <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-primary)]">{eyebrow}</p> : null}
         <h1 className="mt-1 text-2xl font-black text-slate-950 sm:text-3xl">{title}</h1>

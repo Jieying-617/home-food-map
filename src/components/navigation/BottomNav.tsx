@@ -25,7 +25,7 @@ export function BottomNav({ familyId }: { familyId: string }) {
   return (
     <nav
       aria-label="主导航"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--color-border)] bg-white/95 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur"
+      className="bottom-nav-surface fixed inset-x-0 bottom-0 z-20 border-t border-[var(--color-border)] backdrop-blur"
     >
       <div className="mx-auto grid min-h-20 max-w-5xl grid-cols-5 px-2 pb-2 pt-2">
         {items.map((item) => {

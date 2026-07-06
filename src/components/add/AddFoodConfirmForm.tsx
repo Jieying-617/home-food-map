@@ -60,9 +60,9 @@ function validate(form: ConfirmDraft): FieldErrors {
   return errors;
 }
 
-const inputClass = "min-h-12 w-full rounded-md border border-slate-300 bg-white p-3 text-base text-slate-950 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-soft)]";
-const errorInputClass = "border-red-400 focus:border-red-500 focus:ring-red-100";
-const fieldErrorClass = "mt-1 text-sm font-semibold text-red-700";
+const inputClass = "field-control";
+const errorInputClass = "field-control-error";
+const fieldErrorClass = "field-error";
 const commonUnits = ["件", "包", "袋", "盒", "瓶", "罐", "斤"];
 
 export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfirmFormProps) {
@@ -113,8 +113,8 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
   }
 
   return (
-    <div className="space-y-4 rounded-lg border border-[var(--color-border)] bg-white p-4 sm:p-5">
-      <div className="rounded-lg bg-[var(--color-primary-soft)] p-3">
+    <div className="surface-card space-y-4 p-4 sm:p-5">
+      <div className="info-panel">
         <p className="text-base font-black text-slate-950">{sourceCopy.title}</p>
         <p className="mt-1 text-sm leading-6 text-slate-700">{sourceCopy.description}</p>
       </div>
@@ -157,7 +157,7 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         {commonUnits.map((unit) => (
           <button
             key={unit}
-            className={`min-h-11 min-w-11 rounded-md border px-3 text-sm font-bold ${form.unit === unit ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" : "border-[var(--color-border)] bg-white text-slate-700 hover:bg-[var(--color-muted)]"}`}
+            className={`min-h-11 min-w-11 rounded-md border px-3 text-sm font-bold ${form.unit === unit ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" : "btn-quiet"}`}
             type="button"
             onClick={() => updateForm({ ...form, unit })}
           >
@@ -197,7 +197,7 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         {fieldErrors.expiresAt ? <p className={fieldErrorClass} role="alert">{fieldErrors.expiresAt}</p> : null}
       </label>
       <button
-        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 font-bold text-white hover:bg-[var(--color-primary-strong)] disabled:cursor-not-allowed disabled:bg-slate-300"
+        className="btn-primary w-full"
         type="button"
         disabled={isSaving}
         onClick={save}
@@ -205,25 +205,25 @@ export function AddFoodConfirmForm({ familyId, locations, draft }: AddFoodConfir
         <Check aria-hidden className="h-4 w-4" />
         {isSaving ? "保存中..." : "确认保存"}
       </button>
-      {message ? <p className="text-sm font-semibold text-slate-700" role="status">{message}</p> : null}
+      {message ? <p className="status-note" role="status">{message}</p> : null}
       {savedLocationId ? (
-        <div className="grid gap-3 rounded-md bg-[var(--color-primary-soft)] p-3 sm:grid-cols-3">
+        <div className="surface-card-muted grid gap-3 p-3 sm:grid-cols-3">
           <button
-            className="min-h-11 cursor-pointer rounded-md bg-white px-3 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)]"
+            className="btn-quiet min-h-11 px-3 text-sm"
             type="button"
             onClick={continueAdding}
           >
             继续添加同位置
           </button>
           <Link
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-3 text-sm font-bold text-white hover:bg-[var(--color-primary-strong)]"
+            className="btn-primary min-h-11 px-3 text-sm"
             href={`/f/${familyId}/locations/${savedLocationId}`}
           >
             <MapPin aria-hidden className="h-4 w-4" />
             查看这个位置
           </Link>
           <Link
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-white px-3 text-sm font-bold text-[var(--color-primary-strong)] hover:bg-[var(--color-muted)]"
+            className="btn-quiet min-h-11 px-3 text-sm"
             href={`/f/${familyId}`}
           >
             <Home aria-hidden className="h-4 w-4" />

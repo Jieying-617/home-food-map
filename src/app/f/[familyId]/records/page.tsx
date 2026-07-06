@@ -65,8 +65,8 @@ export default async function RecordsPage({ params }: PageProps) {
         {operations.map((operation) => {
           const detail = operationDetail(operation.type, operation.before, operation.after);
           return (
-            <article key={operation.id} className="flex gap-3 rounded-lg border border-[var(--color-border)] bg-white p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+            <article key={operation.id} className="surface-card flex gap-3 p-4">
+              <div className="icon-tile">
                 <History aria-hidden className="h-5 w-5" />
               </div>
               <div className="min-w-0">
@@ -81,7 +81,7 @@ export default async function RecordsPage({ params }: PageProps) {
           );
         })}
         {operations.length === 0 ? (
-          <div className="rounded-lg border border-[var(--color-border)] bg-white p-6 text-center">
+          <div className="empty-state">
             <p className="text-lg font-black text-slate-950">还没有操作记录</p>
             <p className="mt-2 text-sm text-slate-600">添加或处理食物后，这里会出现家庭库存流水。</p>
           </div>

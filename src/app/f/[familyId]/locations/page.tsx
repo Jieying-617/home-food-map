@@ -23,7 +23,7 @@ export default async function LocationsPage({ params }: PageProps) {
         action={
           <Link
             href={`/f/${familyId}/locations/new`}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-bold text-white hover:opacity-90"
+            className="btn-accent text-sm"
           >
             <Plus aria-hidden className="h-4 w-4" />
             添加位置
@@ -35,7 +35,7 @@ export default async function LocationsPage({ params }: PageProps) {
           <LocationCard key={location.id} familyId={familyId} location={location} />
         ))}
         {locations.length === 0 ? (
-          <div className="rounded-lg border border-[var(--color-border)] bg-white p-6 text-center">
+          <div className="empty-state">
             <p className="text-lg font-black text-slate-950">先创建第一个存储位置</p>
             <p className="mt-2 text-sm text-slate-600">比如冰箱冷藏层、厨房吊柜、零食抽屉。</p>
           </div>

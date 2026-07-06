@@ -23,11 +23,11 @@ type RiskBadge = {
 };
 
 const riskBadgeClass = {
-  expired: "border-red-200 bg-red-50 text-red-800",
-  today: "border-red-200 bg-red-50 text-red-800",
-  within7: "border-amber-200 bg-amber-50 text-amber-800",
-  within30: "border-teal-200 bg-teal-50 text-teal-800",
-  calm: "border-slate-200 bg-slate-50 text-slate-700",
+  expired: "risk-badge-expired",
+  today: "risk-badge-today",
+  within7: "risk-badge-week",
+  within30: "risk-badge-month",
+  calm: "risk-badge-calm",
 };
 
 function toDateString(date: Date) {
@@ -70,7 +70,7 @@ export function LocationCard({ familyId, location, today = new Date() }: Locatio
   return (
     <Link
       href={`/f/${familyId}/locations/${location.id}`}
-      className="group grid overflow-hidden rounded-lg border border-[var(--color-border)] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)] sm:grid-cols-[180px_1fr]"
+      className="surface-card group grid overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] sm:grid-cols-[180px_1fr]"
     >
       <div className="vichy-check aspect-[4/3] sm:aspect-auto">
         {cover ? (
@@ -90,18 +90,18 @@ export function LocationCard({ familyId, location, today = new Date() }: Locatio
             <ArrowRight aria-hidden className="mt-1 h-5 w-5 shrink-0 text-slate-400 group-hover:text-[var(--color-primary)]" />
           </div>
           <div className="mt-3 flex flex-wrap gap-2 text-sm text-slate-600">
-            <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-3 py-1 font-bold text-slate-700">
+            <span className="meta-pill">
               <Box aria-hidden className="h-4 w-4" />
               {location.foods.length} 件在库
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-3 py-1 font-bold text-[var(--color-primary-strong)]">
+            <span className="meta-pill bg-[var(--color-primary-soft)] text-[var(--color-primary-strong)]">
               <CalendarClock aria-hidden className="h-4 w-4" />
               {nextFood ? nextFood.name : "暂无到期项"}
             </span>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {risk.badges.map((badge) => (
-              <span key={badge.label} className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-black ${badge.className}`}>
+              <span key={badge.label} className={`risk-badge ${badge.className}`}>
                 {badge.label}
               </span>
             ))}

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ImagePlus, Save } from "lucide-react";
-import { createSketchCover } from "@/lib/adapters/sketchCover";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, Save, WandSparkles } from "lucide-react";
 import { updateLocationCover } from "@/lib/server/locations";
 
 type LocationCoverManagerProps = {
@@ -23,50 +22,96 @@ async function uploadFile(file: File | Blob, filename: string) {
   return (await response.json()) as { url: string };
 }
 
+function base64ToBlob(base64: string, mimeType: string) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return new Blob([bytes], { type: mimeType });
+}
+
+async function generateLocationCover(file: File) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  const response = await fetch("/api/generate-location-cover", { method: "POST", body: form });
+  const payload = (await response.json().catch(() => ({}))) as {
+    imageBase64?: string;
+    mimeType?: string;
+    filename?: string;
+    message?: string;
+  };
+
+  if (!response.ok || !payload.imageBase64) {
+    throw new Error(payload.message ?? "AI 卡通封面暂时无法生成，将保存原图作为位置图片。");
+  }
+
+  return {
+    blob: base64ToBlob(payload.imageBase64, payload.mimeType ?? "image/png"),
+    filename: payload.filename ?? `ai-cover-${file.name}.png`,
+  };
+}
+
 export function LocationCoverManager({ familyId, location }: LocationCoverManagerProps) {
   const [file, setFile] = useState<File | null>(null);
   const [coverBlob, setCoverBlob] = useState<Blob | null>(null);
+  const [coverFilename, setCoverFilename] = useState("");
   const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
   const [message, setMessage] = useState("");
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const currentCover = location.sketchCoverUrl || location.photoUrl;
+  const previewUrlRef = useRef("");
 
-  useEffect(() => {
-    if (!file) {
+  function replacePreviewUrl(nextUrl: string) {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = nextUrl;
+    setCoverPreviewUrl(nextUrl);
+  }
+
+  async function chooseFile(nextFile: File | null) {
+    setFile(nextFile);
+    if (!nextFile) {
+      replacePreviewUrl("");
       setCoverBlob(null);
-      setCoverPreviewUrl("");
+      setCoverFilename("");
       setIsGeneratingCover(false);
+      setMessage("");
       return;
     }
 
-    let isActive = true;
-    let objectUrl = "";
-    setIsGeneratingCover(true);
+    const originalPreviewUrl = URL.createObjectURL(nextFile);
+    replacePreviewUrl(originalPreviewUrl);
     setCoverBlob(null);
-    setCoverPreviewUrl("");
-    setMessage("");
+    setCoverFilename("");
+    setIsGeneratingCover(true);
+    setMessage("正在用本地 ComfyUI 生成 AI 卡通封面...");
 
-    createSketchCover(file)
-      .then((blob) => {
-        if (!isActive) return;
-        objectUrl = URL.createObjectURL(blob);
-        setCoverBlob(blob);
-        setCoverPreviewUrl(objectUrl);
-      })
-      .catch(() => {
-        if (!isActive) return;
-        setMessage("卡通封面暂时无法生成，仍可保存原图作为位置照片。");
-      })
-      .finally(() => {
-        if (isActive) setIsGeneratingCover(false);
-      });
+    try {
+      const cover = await generateLocationCover(nextFile);
+      if (previewUrlRef.current !== originalPreviewUrl) return;
+      const coverPreviewUrl = URL.createObjectURL(cover.blob);
+      replacePreviewUrl(coverPreviewUrl);
+      setCoverBlob(cover.blob);
+      setCoverFilename(cover.filename);
+      setMessage("AI 卡通封面已生成。确认满意后保存新图片。");
+      setIsGeneratingCover(false);
+    } catch (error) {
+      if (previewUrlRef.current !== originalPreviewUrl) return;
+      setCoverBlob(null);
+      setCoverFilename("");
+      setMessage(error instanceof Error ? error.message : "AI 卡通封面暂时无法生成，将保存原图作为位置图片。");
+      setIsGeneratingCover(false);
+    } finally {
+      if (previewUrlRef.current === originalPreviewUrl) setIsGeneratingCover(false);
+    }
+  }
 
+  useEffect(() => {
     return () => {
-      isActive = false;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     };
-  }, [file]);
+  }, []);
 
   async function save() {
     if (!file) {
@@ -81,7 +126,7 @@ export function LocationCoverManager({ familyId, location }: LocationCoverManage
       let sketchCoverUrl: string | undefined;
 
       if (coverBlob) {
-        const uploadedCover = await uploadFile(coverBlob, `cartoon-${file.name}.png`);
+        const uploadedCover = await uploadFile(coverBlob, coverFilename || `ai-cover-${file.name}.png`);
         sketchCoverUrl = uploadedCover.url;
       }
 
@@ -91,8 +136,8 @@ export function LocationCoverManager({ familyId, location }: LocationCoverManage
         photoUrl: uploadedPhoto.url,
         sketchCoverUrl,
       });
-      setMessage("位置图片已更换，封面已重新生成。");
-      setFile(null);
+      chooseFile(null);
+      setMessage("位置图片已更换。");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "保存失败，请稍后再试。");
     } finally {
@@ -101,11 +146,11 @@ export function LocationCoverManager({ familyId, location }: LocationCoverManage
   }
 
   return (
-    <section className="grid gap-4 rounded-lg border border-[var(--color-border)] bg-white p-4 sm:p-5 lg:grid-cols-[220px_1fr]">
-      <div className="overflow-hidden rounded-lg bg-[#fff6e5]">
+    <section className="surface-card grid gap-4 p-4 sm:p-5 lg:grid-cols-[220px_1fr]">
+      <div className="overflow-hidden rounded-lg bg-[var(--color-muted)]">
         {coverPreviewUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={coverPreviewUrl} alt="新的卡通位置封面预览" className="aspect-[4/3] h-full w-full object-contain" />
+          <img src={coverPreviewUrl} alt="新的位置封面预览" className="aspect-[4/3] h-full w-full object-contain" />
         ) : currentCover ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={currentCover} alt={location.name} className="aspect-[4/3] h-full w-full object-cover" />
@@ -120,31 +165,32 @@ export function LocationCoverManager({ familyId, location }: LocationCoverManage
       <div className="flex flex-col justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-slate-500">位置图片</p>
-          <h2 className="mt-1 text-xl font-black text-slate-950">更换照片并重新生成封面</h2>
+          <h2 className="mt-1 text-xl font-black text-slate-950">更换照片并生成 AI 卡通封面</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            选择新的柜子、箱子或抽屉照片后，会先生成新的卡通封面预览。确认满意后再保存。
+            选择新的柜子、箱子或抽屉照片后，会优先调用本地 ComfyUI 生成真正的卡通封面；不可用时保存原图。
           </p>
         </div>
 
-        <label className="block rounded-lg border border-dashed border-[var(--color-primary)] bg-[var(--color-primary-soft)] p-4">
+        <label className="upload-panel">
           <span className="mb-2 block text-sm font-bold text-[var(--color-primary-strong)]">新的位置照片</span>
           <input
-            className="block w-full text-sm text-slate-700 file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-md file:border-0 file:bg-white file:px-3 file:text-sm file:font-bold file:text-[var(--color-primary-strong)]"
+            className="upload-input"
             type="file"
             accept="image/*"
             capture="environment"
-            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+            onChange={(event) => void chooseFile(event.target.files?.[0] ?? null)}
           />
         </label>
 
         {file ? (
-          <p className="rounded-md bg-slate-50 p-3 text-sm font-semibold text-slate-700">
-            {coverPreviewUrl ? "新封面预览已生成。" : isGeneratingCover ? "正在生成新封面..." : "已选择新照片。"}
+          <p className="status-note inline-flex items-start gap-2">
+            <WandSparkles aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+            <span>{coverBlob ? "AI 卡通封面预览已生成。" : isGeneratingCover ? "正在生成真正的卡通图；生成前先显示原图。" : "AI 生成不可用时会保存原图。"}</span>
           </p>
         ) : null}
 
         <button
-          className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 font-bold text-white hover:bg-[var(--color-primary-strong)] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto"
+          className="btn-primary w-full sm:w-auto"
           type="button"
           disabled={isSaving}
           onClick={save}
@@ -152,7 +198,7 @@ export function LocationCoverManager({ familyId, location }: LocationCoverManage
           <Save aria-hidden className="h-4 w-4" />
           {isSaving ? "保存中..." : "保存新图片"}
         </button>
-        {message ? <p className="text-sm font-semibold text-slate-700">{message}</p> : null}
+        {message ? <p className="status-note">{message}</p> : null}
       </div>
     </section>
   );

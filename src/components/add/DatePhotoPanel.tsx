@@ -116,9 +116,9 @@ export function DatePhotoPanel({
   }
 
   return (
-    <section className="rounded-lg border border-[var(--color-border)] bg-white p-4">
+    <section className="surface-card p-4">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-800">
+        <div className="icon-tile">
           <Camera aria-hidden className="h-5 w-5" />
         </div>
         <div>
@@ -126,21 +126,21 @@ export function DatePhotoPanel({
           <p className="mt-1 text-sm leading-6 text-slate-600">适合包装食品。拍生产日期、保质期或到期日，保存前仍需确认。</p>
         </div>
       </div>
-      <label className="mt-4 block rounded-lg border border-dashed border-amber-300 bg-amber-50 p-4">
-        <span className="mb-2 block text-sm font-bold text-amber-900">上传日期照片</span>
+      <label className="upload-panel mt-4">
+        <span className="mb-2 block text-sm font-bold text-[var(--color-primary-strong)]">上传日期照片</span>
         <input
           aria-label="上传日期照片"
-          className="block w-full text-sm text-slate-700 file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-md file:border-0 file:bg-white file:px-3 file:text-sm file:font-bold file:text-amber-800"
+          className="upload-input"
           type="file"
           accept="image/*"
           capture="environment"
           onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
         />
       </label>
-      {fallbackNotice ? <p className="mt-3 rounded-md bg-yellow-50 p-3 text-sm font-semibold text-yellow-800">{fallbackNotice}</p> : null}
-      {message ? <p className="mt-3 rounded-md bg-slate-50 p-3 text-sm font-semibold text-slate-700">{message}</p> : null}
+      {fallbackNotice ? <p className="status-note status-note-warning mt-3">{fallbackNotice}</p> : null}
+      {message ? <p className="status-note mt-3">{message}</p> : null}
       {recognizedText ? (
-        <details className="mt-3 rounded-md bg-slate-50 p-3 text-xs text-slate-600" open>
+        <details className="mt-3 rounded-md bg-[var(--color-muted)] p-3 text-xs text-slate-600" open>
           <summary className="cursor-pointer font-bold">识别原文{recognitionSource ? `（${recognitionSource}）` : ""}</summary>
           <pre className="mt-2 whitespace-pre-wrap font-sans">{recognizedText}</pre>
         </details>

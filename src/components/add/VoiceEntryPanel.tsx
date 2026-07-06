@@ -47,9 +47,9 @@ export function VoiceEntryPanel({
   }
 
   return (
-    <section className="rounded-lg border border-[var(--color-border)] bg-white p-4">
+    <section className="surface-card p-4">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-800">
+        <div className="icon-tile">
           <Mic aria-hidden className="h-5 w-5" />
         </div>
         <div>
@@ -58,14 +58,14 @@ export function VoiceEntryPanel({
         </div>
       </div>
       <button
-        className="mt-4 inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[var(--color-primary)] px-4 font-bold text-white hover:bg-[var(--color-primary-strong)]"
+        className="btn-primary mt-4 w-full"
         type="button"
         onClick={startVoice}
       >
         <Mic aria-hidden className="h-4 w-4" />
         开始说话
       </button>
-      {message ? <p className="mt-3 rounded-md bg-slate-50 p-3 text-sm font-semibold text-slate-700">{message}</p> : null}
+      {message ? <p className="status-note mt-3">{message}</p> : null}
       {draft ? (
         <div className="mt-4">
           <AddFoodConfirmForm familyId={familyId} locations={locations} draft={draft} />

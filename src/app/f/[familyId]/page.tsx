@@ -20,6 +20,7 @@ type GroupSection = {
   title: string;
   description: string;
   className: string;
+  countClassName: string;
 };
 
 const sections: GroupSection[] = [
@@ -27,31 +28,36 @@ const sections: GroupSection[] = [
     key: "expired",
     title: "已经过期",
     description: "优先确认是否还能使用，不能再留在库存里。",
-    className: "border-red-200 bg-red-50",
+    className: "risk-panel-expired",
+    countClassName: "risk-count-expired",
   },
   {
     key: "today",
     title: "今天到期",
     description: "今天先吃掉、冷冻或处理。",
-    className: "border-red-200 bg-red-50",
+    className: "risk-panel-today",
+    countClassName: "risk-count-today",
   },
   {
     key: "within3Days",
     title: "3 天内",
     description: "适合安排进这几天的菜单。",
-    className: "border-orange-200 bg-orange-50",
+    className: "risk-panel-today",
+    countClassName: "risk-count-today",
   },
   {
     key: "within7Days",
     title: "7 天内",
     description: "本周采购前先看这里。",
-    className: "border-amber-200 bg-amber-50",
+    className: "risk-panel-week",
+    countClassName: "risk-count-week",
   },
   {
     key: "within30Days",
     title: "30 天内",
     description: "常温和囤货需要定期巡检。",
-    className: "border-teal-200 bg-teal-50",
+    className: "risk-panel-month",
+    countClassName: "risk-count-month",
   },
 ];
 
@@ -60,7 +66,7 @@ function filterClass(isActive: boolean) {
     "shrink-0 rounded-full border px-4 py-2 text-sm font-bold",
     isActive
       ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
-      : "border-[var(--color-border)] bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50",
+      : "border-[var(--color-border)] bg-[var(--color-surface)] text-slate-700 hover:border-[var(--color-secondary)] hover:bg-[var(--color-muted)]",
   ].join(" ");
 }
 
@@ -98,10 +104,30 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
   const activeLocation = locations.find((location) => location.id === locationId);
 
   const summaryCards = [
-    { label: "已过期", value: summary.expiredCount, icon: AlertTriangle, className: "bg-red-50 text-red-800" },
-    { label: "今天到期", value: summary.todayCount, icon: Clock3, className: "bg-rose-50 text-rose-800" },
-    { label: "7 天内", value: summary.within7DaysCount, icon: CalendarDays, className: "bg-amber-50 text-amber-800" },
-    { label: "30 天内", value: summary.within30DaysCount, icon: ShieldCheck, className: "bg-teal-50 text-teal-800" },
+    {
+      label: "已过期",
+      value: summary.expiredCount,
+      icon: AlertTriangle,
+      className: "risk-badge-expired",
+    },
+    {
+      label: "今天到期",
+      value: summary.todayCount,
+      icon: Clock3,
+      className: "risk-badge-today",
+    },
+    {
+      label: "7 天内",
+      value: summary.within7DaysCount,
+      icon: CalendarDays,
+      className: "risk-badge-week",
+    },
+    {
+      label: "30 天内",
+      value: summary.within30DaysCount,
+      icon: ShieldCheck,
+      className: "risk-badge-month",
+    },
   ];
 
   return (
@@ -112,7 +138,7 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
         description="按到期风险自动整理库存，先看红色和橙色，再决定今天吃什么、丢什么、补什么。"
         action={
           <Link
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-bold text-white hover:bg-orange-600"
+            className="btn-accent text-sm"
             href={`/f/${familyId}/add${locationId ? `?locationId=${locationId}` : ""}`}
           >
             <Plus aria-hidden className="h-4 w-4" />
@@ -122,7 +148,7 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
       />
       <CurrentMemberNotice familyId={familyId} />
 
-      <section className="rounded-lg border border-[var(--color-border)] bg-white p-4 sm:p-5">
+      <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[0_10px_30px_rgba(72,55,38,0.06)] sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-bold text-slate-500">{activeLocation ? activeLocation.name : "全部位置"}</p>
@@ -135,7 +161,7 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
             {summaryCards.map((card) => {
               const Icon = card.icon;
               return (
-                <div key={card.label} className={`rounded-lg p-3 ${card.className}`}>
+                <div key={card.label} className={`rounded-lg border p-3 ${card.className}`}>
                   <div className="flex items-center gap-2 text-sm font-bold">
                     <Icon aria-hidden className="h-4 w-4 shrink-0" />
                     <span>{card.label}</span>
@@ -148,7 +174,7 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
         </div>
       </section>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="location-filter-rail flex gap-2 overflow-x-auto py-1">
         <Link className={filterClass(!locationId)} href={`/f/${familyId}`}>
           全部
         </Link>
@@ -172,7 +198,7 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
                   <h2 className="text-lg font-black text-slate-950">{section.title}</h2>
                   <p className="mt-1 text-sm text-slate-600">{section.description}</p>
                 </div>
-                <span className="shrink-0 rounded-full bg-white px-3 py-1 text-sm font-black text-slate-700">
+                <span className={`shrink-0 text-sm ${section.countClassName}`}>
                   {section.foods.length} 件
                 </span>
               </div>
@@ -185,7 +211,7 @@ export default async function FamilyDashboard({ params, searchParams }: PageProp
           ) : null,
         )}
         {urgentCount === 0 ? (
-          <div className="rounded-lg border border-[var(--color-border)] bg-white p-6 text-center">
+          <div className="empty-state">
             <p className="text-lg font-black text-slate-950">当前没有 30 天内到期的食物</p>
             <p className="mt-2 text-sm text-slate-600">可以去位置地图看看库存分布，或继续添加新的食材。</p>
           </div>
