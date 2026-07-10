@@ -44,6 +44,7 @@ next-env.d.ts
 
 # local npm prefix/cache
 /nodejs/
+/.worktrees/
 
 # local sqlite database
 /prisma/dev.db
