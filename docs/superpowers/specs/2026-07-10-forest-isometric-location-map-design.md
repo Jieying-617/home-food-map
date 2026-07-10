@@ -2,7 +2,7 @@
 
 ## Decision
 
-Selected direction: **3D isometric forest diorama with editorial product UI**.
+Selected direction: **interactive 3D storybook forest diorama with editorial product UI**.
 
 The visual direction borrows the design method of Nermin Muminovic's "Saudi Arabia" Dribbble shot without copying its subject matter. Preserve the dimensional isometric composition, sculpted forms, layered terrain, soft studio lighting, controlled color blocking, and generous editorial whitespace. Replace the Saudi city and desert language with a domestic forest world built around storage locations.
 
@@ -10,8 +10,11 @@ The visual direction borrows the design method of Nermin Muminovic's "Saudi Arab
 
 - Original goal: Refactor the `home-food-map` location page into a fairy-tale forest direction with deep green, large areas of whitespace, forest cottages, and strong title typography.
 - Latest user override: Match the shape language and design sense of `https://dribbble.com/shots/27538208-Saudi-Arabia`, but replace the theme with a forest.
+- Responsive composition override: On desktop the island moves toward the visual center; on phones the complete island and cottage must remain visible with breathing room instead of using an oversized crop.
 - Confirmed choice: Central forest island with surrounding functional annotations.
-- Deliverable next: A desktop and mobile visual mockup before production UI implementation.
+- Latest visual choice: `立体绘本森林`, with vivid flowers and mushrooms, natural wood and moss material cues, one orange cat, and one black-and-white cat.
+- Latest interaction choice: Replace the raster hero with a real transparent WebGL model that supports rotation and zoom.
+- Delivery status: The approved desktop and mobile direction is now implemented on the production locations route.
 - Primary audience: Family members scanning household food locations quickly, especially on mobile.
 - Core job: Understand which location to inspect first and recognize the home's storage structure at a glance.
 - Success criteria: The hero reads as a polished 3D illustration, not a CSS icon; the forest world feels authored and dimensional; the title and primary action remain immediately legible; storage data still outranks decoration below the hero.
@@ -49,7 +52,7 @@ Core read: **premium 3D forest diorama + calm editorial household tool**.
 
 Color roles:
 
-- Page background: warm near-white, `#F4F1E8`.
+- Page background: warm near-white, `#F8EEE2`, sampled from the raster edge so the hero remains visually unframed.
 - Primary forest: `#173F32`.
 - Moss: `#748E58`.
 - Deep shadow green: `#102E26`.
@@ -65,7 +68,12 @@ Materials and lighting:
 - Use a refined 3D-rendered material language, between soft clay and lightly textured wood.
 - Surfaces need bevels, thickness, subtle roughness, and believable contact shadows.
 - Trees must have layered volumes rather than flat lollipop silhouettes.
+- Build the canopy in three readable depth bands: tall cool-green pines at the back, staggered medium trees at the cottage edges, and low broadleaf crowns plus flowering shrubs at the island rim.
+- Tree heights, crown widths, rotations, and trunk exposure must vary; avoid a single evenly spaced row or mirrored planting pattern.
+- Key cottage, pine, broadleaf, and flowering-bush silhouettes use compact CC0 GLB assets, while project-bound textures and lighting keep the scene visually authored.
 - The cottage must have architectural depth: eaves, window recesses, door thickness, roof layers, and grounded foundations.
+- Cottage reference override: use a low single-storey cedar forest cabin with a charcoal gable roof, broad glass entrance, warm wall sconces, raised front porch, rails, and three grounded steps; do not use a tall medieval half-timber house.
+- Trees are arranged as three asymmetric clusters with visible gaps between them. Tree trunks must clear cabinet exclusion zones and remain within the moss island's safe ground radius.
 - Use soft upper-left studio light with controlled warm window glow.
 - Keep the scene clean enough to read at mobile size; avoid photorealistic noise.
 
@@ -100,7 +108,7 @@ Materials and lighting:
 
 - At 768px and below, title and actions appear first; the 3D island follows as a wide image with a stable aspect ratio.
 - At 375px, the island remains large enough to show cottage depth, path, and at least three storage cues.
-- Decorative edge details may crop on mobile, but the cottage, cat, and main storage nodes cannot be cut off.
+- Mobile scales the complete island to the art region; the cottage, cat, storage nodes, island edge, and right-side breathing room cannot be cut off.
 - The hero must leave a hint of the next content section visible on common mobile heights.
 - No page-level horizontal overflow at 320px.
 
@@ -110,13 +118,17 @@ Materials and lighting:
 - Generate a landscape master with clear negative space and enough resolution for desktop retina use.
 - Build the visual mockup around the raster asset; do not fabricate a low-fidelity substitute when evaluating the direction.
 - Production location thumbnails may later use coordinated crops or separately generated assets, but the first mockup only needs the hero master and existing location icons.
+- Production delivery serves the master through `next/image` responsive source sets; location fallback crops request thumbnail-sized variants instead of decoding the full desktop raster.
 - No text is rendered inside the generated illustration; all UI text remains live HTML.
 
 ## Interaction And Motion
 
-- First mockup is static. Visual quality is the acceptance criterion.
-- Future motion, if approved, may use very subtle parallax, cat movement, or warm window breathing; it must support reduced motion.
-- Do not use continuous floating animation or game-like bouncing controls.
+- The hero is a real Three.js scene rendered on a transparent canvas, not a raster image plane.
+- Users can rotate horizontally through 360 degrees and zoom with wheel or pinch; vertical orbit and distance are constrained so the model cannot become lost.
+- Panning is disabled. A reset-view control restores the authored isometric camera.
+- Contact shadow is rendered inside the transparent scene and moves with the model; no rectangular image background or baked shadow remains.
+- Do not use continuous auto-rotation, floating animation, or game-like bouncing controls.
+- Reduced-motion mode disables inertial damping while preserving direct manipulation.
 
 ## Quality Gates
 
@@ -133,6 +145,28 @@ Materials and lighting:
 
 - Placeholder scan: No TBD or TODO markers.
 - Internal consistency: The direction is consistently 3D isometric, not watercolor, flat vector, or CSS illustration.
-- Scope check: The next deliverable is one visual mockup, not a full production refactor.
+- Scope check: Production work remains limited to the locations route, its owned components, and its scoped styles.
 - Ambiguity check: "Similar" means design method and dimensional language, not copying Saudi subject matter or exact composition.
 - Request integrity: Forest theme, deep green, generous whitespace, cottage, strong title, and the referenced 3D design sense are all explicitly represented.
+
+## Rendered Verification Record
+
+- Design read: a memorable 3D forest world introduces a practical household inventory tool; the illustration carries emotion while live text carries status and action.
+- Anti-default locks: no flat forest icons, nested cards, gradients, decorative pills, or generic centered hero composition.
+- Visual memory feature: the right-weighted isometric cottage island paired with oversized dark-green Chinese display type.
+- Desktop at 1440x1000: title remains the first read, the full island is visible without a rectangular PNG boundary, the content band begins at 722px, and page-level horizontal overflow is absent.
+- Mobile at 375x812: the illustration uses a 270px crop window with right-anchored art, both actions remain 48px high, the content band begins at 805.8px, and page-level horizontal overflow is absent.
+- Desktop composition policy: remove the right-pulling negative margin and translate the art left within its grid track so the island sits closer to the page center.
+- Mobile composition policy: use a `108vw` image capped by the art region, right-aligned with a small inward offset; preserve the complete cottage, path, cat, storage nodes, and island silhouette.
+- Responsive repair verification: at 375x812 the rendered image is approximately 405x270 inside the 328x270 art window with the island fully visible; at 320x812 it is approximately 346x231 with no page-level horizontal overflow.
+
+## Production Route Status
+
+- Applied to the production route `/f/[familyId]/locations` on 2026-07-10.
+- The route continues to load live data through `listLocations` and derives counts and inspection priority through `buildLocationOverview`.
+- Existing add-location, location-detail, empty-state, and bottom-navigation routes remain unchanged.
+- The production composition uses the approved warm near-white field, 38/62 unframed forest hero, full-width editorial inspection band, and editorial location rows with raster forest fallback crops.
+- Dynamic counts, inspection links, location cards, expiry dates, and risk text remain live HTML; the illustration does not carry product state by itself.
+- Production browser verification: at 375x812 the metrics end exactly where the 270px art region begins and the content band starts at 702px above the 731px navigation; at 320x812 the content band starts at 725px with no horizontal overflow.
+- Interactive 3D verification: transparent canvases render at 760x620 on 1440x900 and 328x270 on 375x812; pixel standard deviation confirms nonblank output, drag changes the rendered view, wheel zoom changes the frame, and the DOM reset control restores the authored camera.
+- The procedural storybook scene contains a moss island, timber cottage, storage furniture, layered pines and shrubs, flowers, coral mushrooms, an orange cat, a black-and-white cat, golden window light, and transparent contact shadow.

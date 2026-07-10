@@ -27,7 +27,7 @@ export function BottomNav({ familyId }: { familyId: string }) {
       aria-label="主导航"
       className="bottom-nav-surface fixed inset-x-0 bottom-0 z-20 border-t border-[var(--color-border)] backdrop-blur"
       style={{
-        background: "color-mix(in srgb, var(--color-surface) 92%, white)",
+        background: "color-mix(in srgb, var(--color-surface) 88%, var(--color-primary-soft))",
         boxShadow: "var(--ui-nav-shadow)",
       }}
     >

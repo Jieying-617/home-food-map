@@ -1,7 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { format } from "date-fns";
-import { ArrowRight, Box, CalendarClock, ImageOff } from "lucide-react";
+import { ArrowRight, Box, CalendarClock } from "lucide-react";
 import { getExpiryNotice } from "@/lib/domain/expiry";
+import {
+  getLocationIllustrationSrc,
+  getLocationIllustrationType,
+} from "@/components/location/LocationIllustration";
 
 type LocationFood = { name: string; expiresAt: Date };
 
@@ -11,6 +16,7 @@ type LocationCardProps = {
   location: {
     id: string;
     name: string;
+    tags?: string | null;
     sketchCoverUrl: string | null;
     photoUrl: string | null;
     foods: LocationFood[];
@@ -62,7 +68,8 @@ function summarizeLocationRisk(foods: LocationFood[], today: Date) {
 }
 
 export function LocationCard({ familyId, location, today = new Date() }: LocationCardProps) {
-  const cover = location.sketchCoverUrl || location.photoUrl;
+  const cover = location.photoUrl;
+  const fallbackType = getLocationIllustrationType(location);
   const nextFood = location.foods[0];
   const risk = summarizeLocationRisk(location.foods, today);
   const priorityText = nextFood ? `${risk.hasUrgentItems ? "先处理" : "最早到期"}：${nextFood.name}` : "这个位置还没有录入食物";
@@ -70,46 +77,47 @@ export function LocationCard({ familyId, location, today = new Date() }: Locatio
   return (
     <Link
       href={`/f/${familyId}/locations/${location.id}`}
-      className="surface-card group grid overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] sm:grid-cols-[180px_1fr]"
+      className="forest-location-card group"
     >
-      <div className="vichy-check aspect-[4/3] sm:aspect-auto">
+      <div className="forest-location-cover">
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={cover} alt={location.name} className="h-full w-full object-cover" />
+          <img src={cover} alt={location.name} className="object-cover" />
         ) : (
-          <div className="flex h-full min-h-36 flex-col items-center justify-center gap-2 text-slate-500">
-            <ImageOff aria-hidden className="h-7 w-7" />
-            <span className="text-sm font-bold">未拍照</span>
-          </div>
+          <Image
+            src={getLocationIllustrationSrc(fallbackType)}
+            alt={`${location.name} 默认柜子插画`}
+            fill
+            sizes="(max-width: 420px) 112px, (max-width: 560px) 104px, 152px"
+            className="forest-location-object-illustration"
+          />
         )}
       </div>
-      <div className="flex min-w-0 flex-col justify-between gap-4 p-4">
-        <div>
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="truncate text-xl font-black text-slate-950">{location.name}</h3>
-            <ArrowRight aria-hidden className="mt-1 h-5 w-5 shrink-0 text-slate-400 group-hover:text-[var(--color-primary)]" />
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2 text-sm text-slate-600">
-            <span className="meta-pill">
-              <Box aria-hidden className="h-4 w-4" />
-              {location.foods.length} 件在库
-            </span>
-            <span className="meta-pill bg-[var(--color-primary-soft)] text-[var(--color-primary-strong)]">
-              <CalendarClock aria-hidden className="h-4 w-4" />
-              {nextFood ? nextFood.name : "暂无到期项"}
-            </span>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
+      <div className="forest-location-card-copy">
+        <div className="forest-location-card-heading">
+          <h3>{location.name}</h3>
+          <ArrowRight aria-hidden />
+        </div>
+        <div className="forest-location-meta">
+          <span>
+            <Box aria-hidden />
+            {location.foods.length} 件在库
+          </span>
+          <span>
+            <CalendarClock aria-hidden />
+            {nextFood ? nextFood.name : "暂无到期项"}
+          </span>
+        </div>
+        <div className="forest-location-risks">
             {risk.badges.map((badge) => (
               <span key={badge.label} className={`risk-badge ${badge.className}`}>
                 {badge.label}
               </span>
             ))}
-          </div>
         </div>
-        <div className="space-y-1 text-sm leading-6 text-slate-600">
-          <p className="font-bold text-slate-700">{priorityText}</p>
-          <p>{nextFood ? `最近到期：${nextFood.expiresAt.toLocaleDateString("zh-CN")}` : "下次收纳时可从这个位置录入。"}</p>
+        <div className="forest-location-summary">
+          <p>{priorityText}</p>
+          <span>{nextFood ? `最近到期：${nextFood.expiresAt.toLocaleDateString("zh-CN")}` : "下次收纳时可从这个位置录入。"}</span>
         </div>
       </div>
     </Link>
